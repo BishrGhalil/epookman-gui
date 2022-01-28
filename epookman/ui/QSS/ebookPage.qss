@@ -1,0 +1,89 @@
+QFrame {
+  color: rgb(189, 147, 249);
+  font: bold 40px;
+}
+
+QLineEdit {
+  background-color: rgb(59, 62, 80);
+  color: rgb(255, 121, 198);
+  border-width: 2px;
+  border-radius: 15px;
+  font: 17px;
+  padding: 6px;
+  selection-color:  rgb(59, 62, 80);
+  selection-background-color:  rgb(189, 147, 249);
+}
+
+QLineEdit:hover {
+  background-color: rgb(97, 102, 131);
+  color: rgb(35, 37, 49);
+}
+
+QLineEdit:focus {
+  background-color: rgb(59, 62, 80);
+  color: rgb(189, 147, 249);
+}
+
+QScrollBar:vertical {
+  border: none;
+  background-color: rgb(40, 42, 54);
+  width: 4px;
+  margin: 78px 0 20px 0;
+}
+
+QScrollBar::handle:vertical {
+  background-color: rgb(255, 121, 198);
+  min-height: 10px;
+}
+
+QScrollBar::handle:vertical:hover {
+  background-color: rgb(189, 147, 249);
+}
+
+QScrollBar::handle:vertical:pressed {
+  background-color: rgb(255, 121, 198);
+}
+
+/* TOP BIN */
+QScrollBar::sub-line:vertical {
+  border: none;
+  background-color: rgb(40, 42, 54);
+  height: 15px;
+  subcontrol-position: top;
+  subcontrol-origin: margin;
+}
+
+/* BOTTOM BIN */
+QScrollBar::add-line:vertical {
+  border: none;
+  background-color: rgb(40, 42, 54);
+  height: 15px;
+  subcontrol-position: bottom;
+  subcontrol-origin: margin;
+}
+
+QLabel {
+  color: rgb(189, 147, 249);
+  font: bold 40px;
+}
+
+
+QPushButton {
+  border: 0px solid;
+  color: rgb(248, 248, 242);
+  background-color: rgb(40, 42, 54);
+  font: 14px;
+}
+
+QPushButton:hover {
+  background-color: rgb(59, 62, 80);
+}
+
+QToolTip {
+  font: 18px;
+  color: rgb(255, 121, 198);
+  background-color: rgb(35, 37, 49);
+  border: 0px solid;
+  margin: 5px;
+  text-align: center; 
+}
