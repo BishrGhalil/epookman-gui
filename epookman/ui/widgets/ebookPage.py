@@ -16,10 +16,12 @@ EBOOKPAGE_SEARCH_WIDTH = 300
 
 class EbookPageContent(QFrame):
 
-    def __init__(self, QParent, parent=None):
+    def __init__(self, QParent, name, parent=None):
         super().__init__(QParent)
         self.setObjectName("ebookpage_content")
         self.parent = parent
+        self.name = name
+
         self.setFrameShape(QFrame.NoFrame)
         self.setFrameShadow(QFrame.Raised)
 
@@ -28,15 +30,30 @@ class EbookPageContent(QFrame):
         self.layout.setSpacing(0)
         self.layout.setObjectName("ebookpage_content_layout")
 
-        conn = connect(DB_PATH)
-        ebookList = fetch_ebooks(conn)
-        conn.close()
-
-        grid = Grid(self, ebookList)
-        self.setGrid(grid)
-
+        self.setEbookList()
+        self.setGrid()
         self.setScrollArea()
         self.setLayoutes()
+
+    def getEbookList(self, name):
+        filterClause = None
+        if name == "READING":
+            filterClause = f"STATUS={Ebook.STATUS_READING}"
+        elif name == "TO READ":
+            filterClause = f"STATUS={Ebook.STATUS_HAVE_NOT_READ}"
+        elif name == "DONE":
+            filterClause = f"STATUS={Ebook.STATUS_HAVE_READ}"
+        elif name == "FAV":
+            filterClause = f"FAV={1}"
+
+        conn = connect(DB_PATH)
+        ebookList = fetch_ebooks(conn, where=filterClause)
+        conn.close()
+        return ebookList
+
+    def setEbookList(self):
+        ebookList = self.getEbookList(self.name)
+        self.ebookList = ebookList
 
     def setScrollArea(self):
         self.scrollArea = QScrollArea(self)
@@ -59,13 +76,14 @@ class EbookPageContent(QFrame):
 
         self.layout.addWidget(self.scrollArea)
 
-    def setGrid(self, grid):
+    def setGrid(self):
+        grid = Grid(self, self.ebookList)
         self.grid = grid
 
 
 class EbookPage(QWidget):
 
-    def __init__(self, parent=None):
+    def __init__(self, name, parent=None):
         super().__init__()
         self.setObjectName("pages_ebookpage")
         self.parent = parent
@@ -78,10 +96,10 @@ class EbookPage(QWidget):
 
         self.setTopBar()
 
-        self.setLabels()
+        self.setLabels(name)
         self.setInputs()
 
-        content = EbookPageContent(self)
+        content = EbookPageContent(self, name)
         self.setContent(content)
 
         self.setLayoutes()
@@ -97,10 +115,10 @@ class EbookPage(QWidget):
         self.topbarLayout.setSpacing(0)
         self.topbarLayout.setObjectName("ebookPage_topbar_layout")
 
-    def setLabels(self):
+    def setLabels(self, name):
         self.pageName = QLabel(self.topbar)
         self.pageName.setObjectName("ebookpage_pagename")
-        self.setPageName("EBOOKMAN")
+        self.setPageName(name)
 
     def setInputs(self):
         self.search = QLineEdit(self.topbar)
@@ -120,27 +138,3 @@ class EbookPage(QWidget):
 
     def setPageName(self, name):
         self.pageName.setText(name)
-
-    def connectFetchList(self, where=None):
-        conn = connect(DB_PATH)
-        ebookList = fetch_ebooks(conn, where=where)
-        conn.close()
-        return ebookList
-
-    def changeEbookPage(self, name):
-        self.setPageName(name)
-        if name == "READING":
-            self.ebookList = self.connectFetchList(
-                where=f"STATUS={Ebook.STATUS_READING}")
-        elif name == "TO READ":
-            self.ebookList = self.connectFetchList(
-                where=f"STATUS={Ebook.STATUS_HAVE_NOT_READ}")
-        elif name == "DONE":
-            self.ebookList = self.connectFetchList(
-                where=f"STATUS={Ebook.STATUS_HAVE_READ}")
-        elif name == "ALL":
-            self.ebookList = self.connectFetchList()
-        elif name == "FAV":
-            self.ebookList = self.connectFetchList(where=f"FAV={1}")
-
-        self.content.grid.update(self.ebookList)

@@ -13,6 +13,8 @@ MAINWINDOW_HEIGHT_MIN = 500
 MAINWINDOW_WIDTH = 1000
 MAINWINDOW_HEIGHT = 500
 
+DEFAULT_PAGE = "ALL"
+
 
 class Ui_MainWindow(object):
 
@@ -53,10 +55,11 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.setButtons()
+        self.setDefaultPage()
 
     def setButtons(self):
         # LEFT MENU BUTTONS
-        leftMenufunc = self.pages.ebookPage.changeEbookPage
+        leftMenufunc = self.pages.changePage
 
         readingBtn = self.leftMenu.reading
         self.connectButton(readingBtn, leftMenufunc, "READING")
@@ -87,3 +90,6 @@ class Ui_MainWindow(object):
                 "MainWindow",
                 "<html><head/><body><p align=\"center\"><span style=\" font-size:15pt;\">EPOOKMAN</span></p></body></html>"
             ))
+
+    def setDefaultPage(self):
+        self.pages.changePage(DEFAULT_PAGE)

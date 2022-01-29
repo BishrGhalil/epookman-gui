@@ -6,8 +6,8 @@
 import subprocess
 from os import path
 
-from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QCursor, QIcon
+from PyQt5.QtCore import (QSize, Qt, QRect)
+from PyQt5.QtGui import (QCursor, QIcon)
 from PyQt5.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton,
                              QVBoxLayout)
 
@@ -87,6 +87,23 @@ class Button(QPushButton):
         self.setIcon(icon)
         self.setIconSize(
             QSize(EBOOKFRAME_BUTTONS_ICON // 2, EBOOKFRAME_BUTTONS_ICON // 2))
+
+
+class EmbtyFrame(QFrame):
+
+    def __init__(self, QParent, parent=None):
+        super().__init__(QParent)
+        self.parent = parent
+
+        self.setGeometry(QRect(0, 0, EBOOKFRAME_WIDTH, EBOOKFRAME_HEIGHT))
+        self.setFrameShape(QFrame.NoFrame)
+        self.setFrameShadow(QFrame.Raised)
+        self.setObjectName("EmbtyFrame")
+
+        self.layout = QVBoxLayout(self)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.setSpacing(0)
+        self.layout.setObjectName("embty_layout")
 
 
 class EbookFrame(QFrame):

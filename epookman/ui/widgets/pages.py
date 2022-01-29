@@ -22,21 +22,45 @@ class Pages(QFrame):
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.layout.setObjectName("pages_layout")
         self.layout.setSpacing(0)
-        self.stack = QStackedWidget(self)
-        self.stack.setObjectName("pages_stack")
 
-        ebookPage = EbookPage(self)
-        folderPage = FoldersPage(self)
-        self.setEbookPage(ebookPage)
-        self.setFolderPage(folderPage)
-
-        self.stack.addWidget(self.ebookPage)
-        self.stack.addWidget(self.foldersPage)
+        self.setStack()
+        self.setPages()
 
         self.layout.addWidget(self.stack)
 
-    def setEbookPage(self, ebookPage):
-        self.ebookPage = ebookPage
+    def setEbookPages(self):
+        self.readingPage = EbookPage("READING")
+        self.toreadPage = EbookPage("TO READ")
+        self.donePage = EbookPage("DONE")
+        self.allPage = EbookPage("ALL")
+        self.favPage = EbookPage("FAV")
 
-    def setFolderPage(self, folderPage):
+        self.pages["READING"] = self.readingPage
+        self.pages["TO READ"] = self.toreadPage
+        self.pages["DONE"] = self.donePage
+        self.pages["ALL"] = self.allPage
+        self.pages["FAV"] = self.favPage
+
+    def setPages(self):
+        self.pages = {}
+
+        self.setEbookPages()
+        self.setFolderPage()
+        self.pages["FOLDERS"] = self.foldersPage
+
+        for page in self.pages.values():
+            self.stack.addWidget(page)
+
+    def setStack(self):
+        self.stack = QStackedWidget(self)
+        self.stack.setObjectName("pages_stack")
+
+    def setFolderPage(self):
+        folderPage = FoldersPage(self)
         self.foldersPage = folderPage
+
+    def changePage(self, name):
+        page = self.pages[name]
+        pagesList = [page for page in self.pages.values()]
+        index = pagesList.index(page)
+        self.stack.setCurrentIndex(index)
