@@ -3,12 +3,13 @@
 # This file is part of epookman, the console ebook manager.
 # License: MIT, see the file "LICENCS" for details.
 
-from PyQt5.QtCore import (QSize, Qt, QRect)
-from PyQt5.QtWidgets import (QFrame, QHBoxLayout, QLineEdit, QScrollArea,
-                             QVBoxLayout, QWidget, QLabel)
+from PyQt5.QtCore import QRect, QSize, Qt
+from PyQt5.QtWidgets import (QFrame, QHBoxLayout, QLabel, QLineEdit,
+                             QScrollArea, QVBoxLayout, QWidget)
 
+from epookman.api.db import DB_PATH, connect, fetch_ebooks
 from epookman.ui.widgets.grid import Grid
-from epookman.api.db import DB_PATH, fetch_ebooks, connect
+from epookman.api.ebook import Ebook
 
 EBOOKPAGE_SEARCH_WIDTH = 300
 
@@ -119,3 +120,27 @@ class EbookPage(QWidget):
 
     def setPageName(self, name):
         self.pageName.setText(name)
+
+    def connectFetchList(self, where=None):
+        conn = connect(DB_PATH)
+        ebookList = fetch_ebooks(conn, where=where)
+        conn.close()
+        return ebookList
+
+    def changeEbookPage(self, name):
+        self.setPageName(name)
+        if name == "READING":
+            self.ebookList = self.connectFetchList(
+                where=f"STATUS={Ebook.STATUS_READING}")
+        elif name == "TO READ":
+            self.ebookList = self.connectFetchList(
+                where=f"STATUS={Ebook.STATUS_HAVE_NOT_READ}")
+        elif name == "DONE":
+            self.ebookList = self.connectFetchList(
+                where=f"STATUS={Ebook.STATUS_HAVE_READ}")
+        elif name == "ALL":
+            self.ebookList = self.connectFetchList()
+        elif name == "FAV":
+            self.ebookList = self.connectFetchList(where=f"FAV={1}")
+
+        self.content.grid.update(self.ebookList)

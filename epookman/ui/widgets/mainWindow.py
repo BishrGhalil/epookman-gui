@@ -56,7 +56,7 @@ class Ui_MainWindow(object):
 
     def setButtons(self):
         # LEFT MENU BUTTONS
-        leftMenufunc = self.pages.ebookPage.setPageName
+        leftMenufunc = self.pages.ebookPage.changeEbookPage
 
         readingBtn = self.leftMenu.reading
         self.connectButton(readingBtn, leftMenufunc, "READING")
