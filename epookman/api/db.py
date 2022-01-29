@@ -6,12 +6,13 @@
 """Epookman database handling functions"""
 
 import sqlite3
+from os import getenv, path
 
 from epookman.api.dirent import Dirent
 from epookman.api.ebook import Ebook
-from os import getenv
 
-DB_PATH = getenv("HOME") + "/epookman.db"
+DB_PATH = path.join(getenv("HOME"), "epookman.db")
+
 
 # Connect and Disconnect functions
 def connect(db_path):
@@ -92,7 +93,6 @@ def commit_dir(conn, Dir):
         VALUES \
         ((SELECT ID FROM DIRS WHERE PATH = ?), ?, ?);", data)
 
-
     conn.commit()
 
 
@@ -112,7 +112,6 @@ def commit_ebook(conn, ebook):
         "TYPE, CATEGORY, STATUS, FAV) " \
         "VALUES ((SELECT ID FROM EBOOKS WHERE NAME = ?), ?, ?, ?, ?, ?, ?);",
         data)
-
 
 
 def del_ebooks(conn, directory=None, name=None, category=None):
@@ -160,7 +159,6 @@ def fetch_ebooks(conn, key="*", where=None, sort_clause=None):
             ebooks.append(ebook)
 
     return ebooks
-
 
 def fetch_dirs(conn):
     cur = conn.cursor()

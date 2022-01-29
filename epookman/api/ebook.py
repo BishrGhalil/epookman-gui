@@ -108,7 +108,7 @@ class Ebook():
         path = self.get_path()
         size = os.stat(path)
         size = "%.2f" % (size.st_size / (1024**2))
-        data["File Size"] = size
+        data["File Size"] = size + "M"
         if self.type == EBOOK_TYPE_PDF:
             with open(path, "rb") as file:
                 pdfreader = PdfFileReader(file)

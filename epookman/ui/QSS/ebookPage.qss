@@ -24,44 +24,6 @@ QLineEdit:focus {
   color: rgb(189, 147, 249);
 }
 
-QScrollBar:vertical {
-  border: none;
-  background-color: rgb(40, 42, 54);
-  width: 4px;
-  margin: 78px 0 20px 0;
-}
-
-QScrollBar::handle:vertical {
-  background-color: rgb(255, 121, 198);
-  min-height: 10px;
-}
-
-QScrollBar::handle:vertical:hover {
-  background-color: rgb(189, 147, 249);
-}
-
-QScrollBar::handle:vertical:pressed {
-  background-color: rgb(255, 121, 198);
-}
-
-/* TOP BIN */
-QScrollBar::sub-line:vertical {
-  border: none;
-  background-color: rgb(40, 42, 54);
-  height: 15px;
-  subcontrol-position: top;
-  subcontrol-origin: margin;
-}
-
-/* BOTTOM BIN */
-QScrollBar::add-line:vertical {
-  border: none;
-  background-color: rgb(40, 42, 54);
-  height: 15px;
-  subcontrol-position: bottom;
-  subcontrol-origin: margin;
-}
-
 QLabel {
   color: rgb(189, 147, 249);
   font: bold 40px;

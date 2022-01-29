@@ -3,12 +3,16 @@
 # This file is part of epookman, the console ebook manager.
 # License: MIT, see the file "LICENCS" for details.
 
+import subprocess
 from os import path
 
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QCursor, QIcon
 from PyQt5.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton,
                              QVBoxLayout)
+
+from epookman.api.db import DB_PATH, commit_ebook, connect
+from epookman.api.ebook import Ebook
 
 EBOOKFRAME_THUMBNAIL_WIDTH = 99 * 2
 EBOOKFRAME_THUMBNAIL_HEIGHT = 128 * 2
@@ -28,21 +32,27 @@ EBOOKFRAME_BUTTONS_WIDTH = EBOOKFRAME_WIDTH
 
 class Button(QPushButton):
 
-    def __init__(self, name, iconPath, tootip, func, QParent, parent=None):
+    def __init__(self,
+                 name,
+                 state,
+                 iconPath,
+                 tootip,
+                 func,
+                 QParent,
+                 parent=None):
         super().__init__(QParent)
-        self.setMaximumSize(
-            QSize(EBOOKFRAME_BUTTONS_ICON, EBOOKFRAME_BUTTONS_ICON))
+
+        self.setSize()
         self.setObjectName(name)
-
-        self.name = name
-        self.iconPath = iconPath
         self.iconFormat = ".xpm"
+        self.state = state
+        self.name = name
 
-        icon = QIcon(path.join(iconPath, name) + self.iconFormat)
-        self.setIcon(icon)
-        self.setIconSize(
-            QSize(EBOOKFRAME_BUTTONS_ICON // 2, EBOOKFRAME_BUTTONS_ICON // 2))
+        self.iconPath = path.join(iconPath, name) + self.iconFormat
+        self.iconDisabledPath = path.join(iconPath,
+                                          name) + "Disabled" + self.iconFormat
 
+        self.setIconByState()
         self.setToolTip(tootip)
 
         #  self.clicked.connect(func)
@@ -50,10 +60,32 @@ class Button(QPushButton):
         self.setMouseTracking(True)
         self.mousePressEvent = lambda event: func(self, event)
 
-        self.state = True
-
     def toggleState(self):
         self.state = not self.state
+        self.setIconByState()
+
+    def disable(self):
+        self.state = False
+        self.setIconByState()
+
+    def enable(self):
+        self.state = True
+        self.setIconByState()
+
+    def setSize(self):
+
+        self.setMaximumSize(
+            QSize(EBOOKFRAME_BUTTONS_ICON, EBOOKFRAME_BUTTONS_ICON))
+
+    def setIconByState(self):
+
+        if self.state:
+            icon = QIcon(self.iconPath)
+        else:
+            icon = QIcon(self.iconDisabledPath)
+        self.setIcon(icon)
+        self.setIconSize(
+            QSize(EBOOKFRAME_BUTTONS_ICON // 2, EBOOKFRAME_BUTTONS_ICON // 2))
 
 
 class EbookFrame(QFrame):
@@ -132,16 +164,25 @@ class EbookFrame(QFrame):
 
         # == Making buttons ==
         # To_Read button
-        self.toread = Button("toread", "epookman/ui/resources",
-                             "Mark as `To Read`", self.markToread,
-                             self.buttons)
+        buttonState = False
+        if self.ebook.status == Ebook.STATUS_HAVE_NOT_READ:
+            buttonState = True
+        self.toread = Button("toread", buttonState, "epookman/ui/resources",
+                             "Mark as To Read", self.markToread, self.buttons)
 
         # Fav button
-        self.fav = Button("fav", "epookman/ui/resources", "Add to Fav",
-                          self.markFav, self.buttons)
+        buttonState = False
+        if self.ebook.fav:
+            buttonState = True
+        self.fav = Button("fav", buttonState, "epookman/ui/resources",
+                          "Add to Fav", self.markFav, self.buttons)
+
         # Done button
-        self.done = Button("done", "epookman/ui/resources", "Mark as `Done`",
-                           self.markDone, self.buttons)
+        buttonState = False
+        if self.ebook.status == Ebook.STATUS_HAVE_READ:
+            buttonState = True
+        self.done = Button("done", buttonState, "epookman/ui/resources",
+                           "Mark as Done", self.markDone, self.buttons)
 
     def setLayoutes(self):
         self.toolbarLayout.addWidget(self.label)
@@ -158,34 +199,55 @@ class EbookFrame(QFrame):
 
     def openEbook(self, event):
         if event.button() == Qt.LeftButton:
-            print("Openning Ebook: %s" % self.ebook.get_path())
+
+            ereader = "zathura"
+            file = open("/dev/null", "w")
+            subprocess.run([ereader, self.ebook.get_path()], stderr=file)
+            file.close()
 
     def markToread(self, button, event):
-        self.ebook.set_status("have_not_read")
+        if self.ebook.status == Ebook.STATUS_HAVE_READ:
+            self.toggleIcon(self.done, False)
 
-        self.toggleIcon(button, event)
+        self.toggleIcon(button, True)
+        self.ebook.set_status(Ebook.STATUS_HAVE_NOT_READ)
+        self.commit()
+
+        self.updateFrame(event)
 
     def markFav(self, button, event):
+        state = True if not button.state else False
+        self.toggleIcon(button, state)
         self.ebook.toggle_fav()
+        self.commit()
 
-        self.toggleIcon(button, event)
+        self.updateFrame(event)
 
     def markDone(self, button, event):
-        self.ebook.set_status("have_read")
+        if self.ebook.status == Ebook.STATUS_HAVE_NOT_READ:
+            self.toggleIcon(self.toread, False)
 
-        self.toggleIcon(button, event)
+        self.toggleIcon(button, True)
+        self.ebook.set_status(Ebook.STATUS_HAVE_READ)
+        self.commit()
 
-    def toggleIcon(self, button, event):
-        button.toggleState()
+        self.updateFrame(event)
 
-        if not button.state:
-            iconPath = path.join(button.iconPath,
-                                 button.name) + "Disabled" + button.iconFormat
-            icon = QIcon(iconPath)
+    def toggleIcon(self, button, status):
+        if status:
+            button.enable()
         else:
-            iconPath = path.join(button.iconPath,
-                                 button.name) + button.iconFormat
-            icon = QIcon(iconPath)
+            button.disable()
 
-        button.setIcon(icon)
-        super().eventFilter(button, event)
+    def updateInfo(self):
+        self.thumbnail.setToolTip(self.ebook.get_meta_data_string())
+
+    def updateFrame(self, event):
+        self.updateInfo()
+        super().eventFilter(self, event)
+
+    def commit(self):
+        conn = connect(DB_PATH)
+        commit_ebook(conn, self.ebook)
+        conn.commit()
+        conn.close()
