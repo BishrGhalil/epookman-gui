@@ -166,6 +166,7 @@ class EbookFrame(QFrame):
         self.label = QLabel(self.toolbar)
         self.label.setObjectName("labelEbookname_%s" % self.ebook.name)
         self.label.setText(self.ebook.name)
+        self.label.setToolTip(self.ebook.name)
 
     def setButtons(self):
         # == Making buttons frame ==

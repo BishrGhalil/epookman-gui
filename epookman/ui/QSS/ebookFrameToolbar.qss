@@ -22,9 +22,3 @@ QPushButton:focus {
   background-color: rgb(59, 62, 80);
 }
 
-QToolTip {
-  font: 20px;
-  color: rgb(189, 147, 249);
-  background-color: rgb(59, 62, 80);
-  border: 0px solid;
-}
