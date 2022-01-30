@@ -56,10 +56,8 @@ class Button(QPushButton):
         self.setIconByState()
         self.setToolTip(tootip)
 
-        #  self.clicked.connect(func)
-
         self.setMouseTracking(True)
-        self.mousePressEvent = lambda event: func(self, event)
+        self.setClickFunction(func)
 
     def toggleState(self):
         self.state = not self.state
@@ -87,6 +85,9 @@ class Button(QPushButton):
         self.setIcon(icon)
         self.setIconSize(
             QSize(EBOOKFRAME_BUTTONS_ICON // 2, EBOOKFRAME_BUTTONS_ICON // 2))
+
+    def setClickFunction(self, func, *args):
+        self.mousePressEvent = lambda event: func(self, *args, event)
 
 
 class EmbtyFrame(QFrame):

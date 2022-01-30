@@ -64,3 +64,4 @@ class Pages(QFrame):
         pagesList = [page for page in self.pages.values()]
         index = pagesList.index(page)
         self.stack.setCurrentIndex(index)
+        page.content.update()

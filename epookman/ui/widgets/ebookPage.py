@@ -34,6 +34,7 @@ class EbookPageContent(QFrame):
         self.setGrid()
         self.setScrollArea()
         self.setLayoutes()
+        self.installEventFilter(self)
 
     def getEbookList(self, name):
         filterClause = None
@@ -79,6 +80,10 @@ class EbookPageContent(QFrame):
     def setGrid(self):
         grid = Grid(self, self.ebookList)
         self.grid = grid
+
+    def update(self):
+        self.setEbookList()
+        self.grid.update(self.ebookList)
 
 
 class EbookPage(QWidget):
@@ -138,3 +143,6 @@ class EbookPage(QWidget):
 
     def setPageName(self, name):
         self.pageName.setText(name)
+
+    def update(self, event):
+        super().eventFilter(self, event)

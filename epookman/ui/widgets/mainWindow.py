@@ -61,26 +61,27 @@ class Ui_MainWindow(object):
         # LEFT MENU BUTTONS
         leftMenufunc = self.pages.changePage
 
-        readingBtn = self.leftMenu.reading
-        self.connectButton(readingBtn, leftMenufunc, "READING")
+        button = self.leftMenu.reading
+        self.connectButton(button, leftMenufunc, "READING")
 
-        toreadBtn = self.leftMenu.toread
-        self.connectButton(toreadBtn, leftMenufunc, "TO READ")
+        button = self.leftMenu.toread
+        self.connectButton(button, leftMenufunc, "TO READ")
 
-        allBtn = self.leftMenu.all
-        self.connectButton(allBtn, leftMenufunc, "ALL")
+        button = self.leftMenu.all
+        self.connectButton(button, leftMenufunc, "ALL")
 
-        doneBtn = self.leftMenu.done
-        self.connectButton(doneBtn, leftMenufunc, "DONE")
+        button = self.leftMenu.done
+        self.connectButton(button, leftMenufunc, "DONE")
 
-        favBtn = self.leftMenu.fav
-        self.connectButton(favBtn, leftMenufunc, "FAV")
+        button = self.leftMenu.fav
+        self.connectButton(button, leftMenufunc, "FAV")
 
-        foldersBtn = self.leftMenu.folders
-        self.connectButton(foldersBtn, leftMenufunc, "FOLDERS")
+        button = self.leftMenu.folders
+        self.connectButton(button, leftMenufunc, "FOLDERS")
 
     def connectButton(self, button, func, *args):
-        button.clicked.connect(lambda: func(*args))
+        button.setMouseTracking(True)
+        button.mousePressEvent = lambda event: func(*args)
 
     def retranslateUi(self, MainWindow):
         _translate = translate
