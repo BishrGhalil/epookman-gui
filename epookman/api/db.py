@@ -160,6 +160,7 @@ def fetch_ebooks(conn, key="*", where=None, sort_clause=None):
 
     return ebooks
 
+
 def fetch_dirs(conn):
     cur = conn.cursor()
     res = cur.execute("SELECT DISTINCT * FROM DIRS ORDER BY PATH;")

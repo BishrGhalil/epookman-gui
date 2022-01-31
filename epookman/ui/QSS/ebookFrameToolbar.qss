@@ -21,4 +21,3 @@ QPushButton:hover {
 QPushButton:focus {
   background-color: rgb(59, 62, 80);
 }
-

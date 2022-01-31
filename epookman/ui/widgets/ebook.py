@@ -4,15 +4,16 @@
 # License: MIT, see the file "LICENCS" for details.
 
 import subprocess
-from os import path
+from os import getenv, path
 
-from PyQt5.QtCore import (QSize, Qt, QRect)
-from PyQt5.QtGui import (QCursor, QIcon)
+from PyQt5.QtCore import QRect, QSize, Qt
+from PyQt5.QtGui import QBrush, QCursor, QIcon, QPalette, QPixmap
 from PyQt5.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton,
                              QVBoxLayout)
 
 from epookman.api.db import DB_PATH, commit_ebook, connect
 from epookman.api.ebook import Ebook
+from epookman.api.thumbnailer import thumbnailer
 
 SCALE = 2
 EBOOKFRAME_THUMBNAIL_WIDTH = 99 * SCALE
@@ -29,6 +30,9 @@ EBOOKFRAME_TOOLBAR_HEIGHT = 42
 EBOOKFRAME_BUTTONS_ICON = 40
 EBOOKFRAME_BUTTONS_HEIGHT = EBOOKFRAME_BUTTONS_ICON
 EBOOKFRAME_BUTTONS_WIDTH = EBOOKFRAME_WIDTH
+
+THUMBNAILS_DIR = path.join(getenv("HOME"), ".cache", "epookman-gui",
+                           "thumbnails")
 
 
 class Button(QPushButton):
@@ -133,6 +137,20 @@ class EbookFrame(QFrame):
 
         self.installEventFilter(self)
 
+    def createThumbnail(self):
+        self.thumbnail_file = path.join(THUMBNAILS_DIR,
+                                        self.ebook.name + ".png")
+
+        if not path.lexists(self.thumbnail_file):
+            if thumbnailer(self.ebook.path,
+                           path.join(THUMBNAILS_DIR, self.ebook.name)) == 0:
+                return True
+            else:
+                return False
+
+        else:
+            return True
+
     def setThumbnail(self):
         self.thumbnail = QFrame(self)
         self.thumbnail.setMouseTracking(True)
@@ -149,22 +167,29 @@ class EbookFrame(QFrame):
         self.thumbnail.setFrameShadow(QFrame.Raised)
         self.thumbnail.setObjectName("ebook_thumbnail_%s" % self.ebook.name)
 
+        if self.createThumbnail():
+            label = QLabel(self.thumbnail)
+            img = QPixmap(self.thumbnail_file)
+            img = img.scaled(EBOOKFRAME_THUMBNAIL_WIDTH,
+                             EBOOKFRAME_THUMBNAIL_HEIGHT)
+            label.setPixmap(img)
+
     def setToolbar(self):
-        self.toolbar = QFrame(self)
-        self.toolbar.setMaximumSize(QSize(16777215, EBOOKFRAME_TOOLBAR_HEIGHT))
+        self.buttombar = QFrame(self)
+        self.buttombar.setMaximumSize(
+            QSize(16777215, EBOOKFRAME_TOOLBAR_HEIGHT))
 
         with open("epookman/ui/QSS/ebookFrameToolbar.qss", "r") as f:
-            self.toolbar.setStyleSheet(f.read())
+            self.buttombar.setStyleSheet(f.read())
 
-        self.toolbar.setFrameShape(QFrame.NoFrame)
-        self.toolbar.setFrameShadow(QFrame.Raised)
-        self.toolbar.setObjectName("ebook_toolbar_%s" % self.ebook.name)
-        self.toolbarLayout = QHBoxLayout(self.toolbar)
-        self.toolbarLayout.setObjectName("ebook_toolbar_layout_%s" %
-                                         self.ebook.name)
+        self.buttombar.setFrameShape(QFrame.NoFrame)
+        self.buttombar.setFrameShadow(QFrame.Raised)
+        self.buttombar.setObjectName("ebook_buttom%s" % self.ebook.name)
+        self.buttombarLayout = QHBoxLayout(self.buttombar)
+        self.buttombarLayout.setObjectName("ebook_buttom%s" % self.ebook.name)
 
     def setLabels(self):
-        self.label = QLabel(self.toolbar)
+        self.label = QLabel(self.buttombar)
         self.label.setObjectName("labelEbookname_%s" % self.ebook.name)
         self.label.setText(self.ebook.name)
         self.label.setToolTip(self.ebook.name)
@@ -205,7 +230,7 @@ class EbookFrame(QFrame):
                            "Mark as Done", self.markDone, self.buttons)
 
     def setLayoutes(self):
-        self.toolbarLayout.addWidget(self.label)
+        self.buttombarLayout.addWidget(self.label)
 
         self.buttonsLayout.addWidget(self.toread)
         self.buttonsLayout.addWidget(self.fav)
@@ -213,7 +238,7 @@ class EbookFrame(QFrame):
 
         self.layout.addWidget(self.buttons)
         self.layout.addWidget(self.thumbnail)
-        self.layout.addWidget(self.toolbar)
+        self.layout.addWidget(self.buttombar)
 
         self.setCursor(QCursor(Qt.PointingHandCursor))
 

@@ -5,18 +5,15 @@
 # License: MIT, see the file "LICENCS" for details.
 """PDF thumbnailer"""
 
-from PyPDF2 import PdfFileReader
 from os import path
+import subprocess
 
 
-def thumbnailer(file, output=None):
-    if not output:
-        output = path.dirname(file)
-        output = output.removesuffex(".pdf")
-        output = output.removesuffex(".epub")
-        output += ".jpg"
-
-    reader = PdfFileReader(file)
-    page1 = reader.getPage(0)
-    with open(output, "w") as file:
-        file.write(page1.extractText())
+def thumbnailer(file, output):
+    if ".pdf" not in file:
+        return -1
+    if path.lexists(file):
+        return subprocess.run(
+            ["pdftocairo", "-singlefile", file, "-png", output])
+    else:
+        print("File %s does not exists" % file)

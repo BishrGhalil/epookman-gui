@@ -10,6 +10,7 @@ import os
 import epub_meta
 import PyPDF2
 from PyPDF2 import PdfFileReader
+import re
 
 EBOOK_TYPE_PDF = 0
 EBOOK_TYPE_EPUB = 1
@@ -33,14 +34,6 @@ class Ebook():
                  fav=0,
                  ebook_type=None):
 
-        self.name = name
-        self.id = _id
-        self.folder = folder
-        self.category = category
-        self.status = status
-        self.fav = fav
-        self.type = ebook_type
-
         self.ebook_types = {
             "pdf": EBOOK_TYPE_PDF,
             "epub": EBOOK_TYPE_EPUB,
@@ -49,6 +42,15 @@ class Ebook():
             "cbr": EBOOK_TYPE_CBR,
             "cbz": EBOOK_TYPE_CBZ
         }
+
+        self.name = name
+        self.id = _id
+        self.folder = folder
+        self.category = category
+        self.status = status
+        self.fav = fav
+        self.path = self.get_path()
+        self.set_type(ebook_type)
 
     def set_path(self, path):
         self.folder = os.path.dirname(path)
@@ -63,8 +65,14 @@ class Ebook():
     def set_category(self, category):
         self.category = category
 
-    def set_type(self, ebook_type):
-        self.type = ebook_type
+    def set_type(self, _type):
+        if type(_type) == str:
+            for ebook_type in self.ebook_types.keys():
+                if re.search(ebook_type, _type):
+                    self.type = self.ebook_types.get(ebook_type)
+                    return
+        else:
+            self.type = _type if _type in self.ebook_types.values() else None
 
     def get_path(self):
         uri = os.path.join(self.folder, self.name)
@@ -109,23 +117,23 @@ class Ebook():
         size = os.stat(path)
         size = "%.2f" % (size.st_size / (1024**2))
         data["File Size"] = size + "M"
-        if self.type == EBOOK_TYPE_PDF:
+        if self.type == self.ebook_types.get("pdf"):
             with open(path, "rb") as file:
                 pdfreader = PdfFileReader(file)
                 data["Encrypt"] = pdfreader.isEncrypted
                 if not data.get("Encrypt"):
-                    data["Number of Pages"] = pdfreader.numPages
+                    data["Pages"] = pdfreader.numPages
                     info = pdfreader.documentInfo
-                    data["Creation Date"] = info.get('/CreationDate')
-                    data["Modification Date"] = info.get('/ModDate')
+                    data["Creation"] = info.get('/CreationDate')
+                    data["Modification"] = info.get('/ModDate')
                     data["Creators"] = info.get('/Creator')
 
-        if self.type == EBOOK_TYPE_EPUB:
+        elif self.type == self.ebook_types.get("epub"):
             tmp_data = epub_meta.get_epub_metadata(path,
                                                    read_cover_image=False,
                                                    read_toc=False)
             data["Creators"] = tmp_data.authors
-            data["Creation Date"] = tmp_data.publication_date
+            data["Creation"] = tmp_data.publication_date
 
         return data
 

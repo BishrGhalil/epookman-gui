@@ -8,9 +8,10 @@
 import curses
 import pdb
 from sys import argv
+from os import (getenv, path, mkdir)
 
-from PyQt5 import QtCore, QtGui, QtWidgets
-from epookman.ui.widgets.mainWindow import Ui_MainWindow
+from PyQt5 import (QtCore, QtGui, QtWidgets)
+from epookman.ui.widgets.mainWindow import (Ui_MainWindow)
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -23,12 +24,29 @@ class MainWindow(QtWidgets.QMainWindow):
         self.show()
 
 
+def createDirs():
+    home = getenv("HOME")
+
+    cache = path.join(home, ".cache", "epookman-gui")
+    if not path.lexists(cache):
+        mkdir(cache)
+    thumbnails = path.join(home, ".cache", "epookman-gui", "thumbnails")
+    if not path.lexists(thumbnails):
+        mkdir(thumbnails)
+
+    config = path.join(home, ".config", "epookman-gui")
+    if not path.lexists(config):
+        mkdir(config)
+
+
 def main():
     if len(argv) > 1:
         if "-h" in argv or "--help" in argv:
             print("Usage: epookman [OPTIONS]\n")
             print("There no options.")
             exit(0)
+
+    createDirs()
     app = QtWidgets.QApplication(argv)
     window = MainWindow()
     return app.exec_()

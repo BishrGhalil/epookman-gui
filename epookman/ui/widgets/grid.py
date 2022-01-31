@@ -13,7 +13,7 @@ class Grid(QFrame):
     def __init__(self, QParent, ebookList, parent=None):
         super().__init__(QParent)
         self.parent = parent
-        self.cols = QParent.frameGeometry().width() * 10 // EBOOKFRAME_WIDTH
+        self.cols = int(QParent.frameGeometry().width() * 10 / EBOOKFRAME_WIDTH)
         self.setFrameShape(QFrame.NoFrame)
         self.setFrameShadow(QFrame.Raised)
         self.setObjectName("ebookpage_grid")
