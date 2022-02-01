@@ -46,8 +46,10 @@ class Dirent():
         path = self.path
         self.getfiles_from_path(path)
 
-    def set_values(self, uri, recurs):
+    def set_path(self, uri):
         self.path = uri
+
+    def set_recurs(self, recurs):
         self.recurs = recurs
 
     def __str__(self):

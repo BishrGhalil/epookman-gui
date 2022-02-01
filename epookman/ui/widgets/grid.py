@@ -3,6 +3,7 @@
 # This file is part of epookman, the console ebook manager.
 # License: MIT, see the file "LICENCS" for details.
 from PyQt5.QtWidgets import (QFrame, QGridLayout, QLabel)
+from PyQt5.QtCore import Qt
 
 from epookman.ui.widgets.ebook import (EBOOKFRAME_WIDTH, EbookFrame,
                                        EmbtyFrame)
@@ -13,7 +14,8 @@ class Grid(QFrame):
     def __init__(self, QParent, ebookList, parent=None):
         super().__init__(QParent)
         self.parent = parent
-        self.cols = int(QParent.frameGeometry().width() * 10 / EBOOKFRAME_WIDTH)
+        self.cols = int(QParent.frameGeometry().width() * 10 /
+                        EBOOKFRAME_WIDTH)
         self.setFrameShape(QFrame.NoFrame)
         self.setFrameShadow(QFrame.Raised)
         self.setObjectName("ebookpage_grid")
@@ -21,6 +23,7 @@ class Grid(QFrame):
         self.layout.setObjectName("ebookpage_grid_layout")
         self.layout.setContentsMargins(0, 30, 0, 0)
         self.layout.setSpacing(30)
+        self.layout.setAlignment(Qt.AlignLeft | Qt.AlignTop)
 
         self.set(ebookList)
 
@@ -40,14 +43,6 @@ class Grid(QFrame):
 
             ebookFrame = EbookFrame(self, ebook)
             self.layout.addWidget(ebookFrame, row, col)
-
-        _len = len(ebookList)
-        if _len < self.cols:
-            row = 0
-            for i in range(_len + 1, self.cols + 2):
-                if i > self.cols:
-                    row = 1
-                self.layout.addWidget(EmbtyFrame(self), row, i)
 
     def delete(self):
         for cnt in reversed(range(self.layout.count())):

@@ -162,7 +162,7 @@ class EbookFrame(QFrame):
         self.thumbnail.setMaximumSize(
             QSize(EBOOKFRAME_THUMBNAIL_WIDTH, EBOOKFRAME_THUMBNAIL_HEIGHT))
         self.thumbnail.setLayoutDirection(Qt.LeftToRight)
-        self.thumbnail.setToolTip(self.ebook.get_meta_data_string())
+        self.thumbnail.setToolTip(self.ebook.metadata)
         self.thumbnail.setFrameShape(QFrame.NoFrame)
         self.thumbnail.setFrameShadow(QFrame.Raised)
         self.thumbnail.setObjectName("ebook_thumbnail_%s" % self.ebook.name)
@@ -285,7 +285,7 @@ class EbookFrame(QFrame):
             button.disable()
 
     def updateInfo(self):
-        self.thumbnail.setToolTip(self.ebook.get_meta_data_string())
+        self.thumbnail.setToolTip(self.ebook.metadata)
 
     def updateFrame(self, event):
         self.updateInfo()

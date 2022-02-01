@@ -35,6 +35,7 @@ class Mime():
         for ebook_type in self.re_ebooks_types.keys():
             if re.search(ebook_type, mime_t):
                 return self.re_ebooks_types.get(ebook_type)
+        return None
 
     def is_ebook(self, mime_type):
         if MIME_TYPE_EBOOK_PDF <= mime_type <= MIME_TYPE_EBOOK_CBZ:

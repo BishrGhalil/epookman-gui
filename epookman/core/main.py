@@ -12,6 +12,8 @@ from os import (getenv, path, mkdir)
 
 from PyQt5 import (QtCore, QtGui, QtWidgets)
 from epookman.ui.widgets.mainWindow import (Ui_MainWindow)
+from epookman.api.db import *
+from epookman.api.search import scane_commit
 
 
 class MainWindow(QtWidgets.QMainWindow):

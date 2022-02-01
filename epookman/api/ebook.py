@@ -32,7 +32,8 @@ class Ebook():
                  category=None,
                  status=0,
                  fav=0,
-                 ebook_type=None):
+                 ebook_type=None,
+                 metadata=None):
 
         self.ebook_types = {
             "pdf": EBOOK_TYPE_PDF,
@@ -51,6 +52,7 @@ class Ebook():
         self.fav = fav
         self.path = self.get_path()
         self.set_type(ebook_type)
+        self.metadata = metadata
 
     def set_path(self, path):
         self.folder = os.path.dirname(path)

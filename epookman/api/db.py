@@ -49,7 +49,8 @@ def create_ebooks_table(conn):
         "TYPE           INT    NOT NULL," \
         "CATEGORY       TEXT," \
         "STATUS         INT," \
-        "FAV            INT);")
+        "FAV            INT," \
+        "METADATA       TEXT);")
 
     conn.commit()
 
@@ -105,12 +106,12 @@ def commit_ebooks(conn, ebooks):
 def commit_ebook(conn, ebook):
     cur = conn.cursor()
     data = (ebook.name, ebook.folder, ebook.name, ebook.type, ebook.category,
-            ebook.status, ebook.fav)
+            ebook.status, ebook.fav, ebook.metadata)
     cur.execute(
         "INSERT OR REPLACE "\
         "INTO EBOOKS (ID, FOLDER, NAME, " \
-        "TYPE, CATEGORY, STATUS, FAV) " \
-        "VALUES ((SELECT ID FROM EBOOKS WHERE NAME = ?), ?, ?, ?, ?, ?, ?);",
+        "TYPE, CATEGORY, STATUS, FAV, METADATA) " \
+        "VALUES ((SELECT ID FROM EBOOKS WHERE NAME = ?), ?, ?, ?, ?, ?, ?, ?);",
         data)
 
 
@@ -155,7 +156,8 @@ def fetch_ebooks(conn, key="*", where=None, sort_clause=None):
                           ebook_type=row[3],
                           category=row[4],
                           status=row[5],
-                          fav=row[6])
+                          fav=row[6],
+                          metadata=row[7])
             ebooks.append(ebook)
 
     return ebooks
@@ -171,7 +173,8 @@ def fetch_dirs(conn):
 
     for row in res:
         Dir = Dirent()
-        Dir.set_values(row[1], row[2])
+        Dir.set_path(row[1])
+        Dir.set_recurs(row[2])
         dirs.append(Dir)
 
     return dirs
