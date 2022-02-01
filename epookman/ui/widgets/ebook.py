@@ -136,6 +136,7 @@ class EbookFrame(QFrame):
         self.setLayoutes()
 
         self.installEventFilter(self)
+        self.name = ebook.name
 
     def createThumbnail(self):
         self.thumbnail_file = path.join(THUMBNAILS_DIR,
@@ -247,7 +248,7 @@ class EbookFrame(QFrame):
 
             ereader = "zathura"
             file = open("/dev/null", "w")
-            subprocess.run([ereader, self.ebook.get_path()], stderr=file)
+            subprocess.Popen([ereader, self.ebook.get_path()], stderr=file)
             file.close()
 
     def markToread(self, button, event):
@@ -296,3 +297,11 @@ class EbookFrame(QFrame):
         commit_ebook(conn, self.ebook)
         conn.commit()
         conn.close()
+
+    def hide(self):
+        for w in [self, self.buttons, self.buttombar, self.thumbnail]:
+            w.setVisible(False)
+
+    def show(self):
+        for w in [self, self.buttons, self.buttombar, self.thumbnail]:
+            w.setVisible(True)

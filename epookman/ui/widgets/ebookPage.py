@@ -130,6 +130,7 @@ class EbookPage(QWidget):
         self.search.setMaximumSize(QSize(EBOOKPAGE_SEARCH_WIDTH, 16777215))
         self.search.setObjectName("ebookpage_search")
         self.search.setPlaceholderText("Search")
+        self.search.textChanged.connect(self.searchHandler)
 
     def setLayoutes(self):
         self.topbarLayout.addWidget(self.pageName)
@@ -143,6 +144,9 @@ class EbookPage(QWidget):
 
     def setPageName(self, name):
         self.pageName.setText(name)
+
+    def searchHandler(self, text):
+        self.content.grid.search(text)
 
     def update(self, event):
         super().eventFilter(self, event)

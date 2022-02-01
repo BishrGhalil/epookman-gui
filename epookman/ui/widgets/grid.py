@@ -25,6 +25,7 @@ class Grid(QFrame):
         self.layout.setSpacing(30)
         self.layout.setAlignment(Qt.AlignLeft | Qt.AlignTop)
 
+        self.widgets = {}
         self.set(ebookList)
 
     def set(self, ebookList):
@@ -42,6 +43,7 @@ class Grid(QFrame):
             col += 1
 
             ebookFrame = EbookFrame(self, ebook)
+            self.widgets[ebook.name] = ebookFrame
             self.layout.addWidget(ebookFrame, row, col)
 
     def delete(self):
@@ -54,3 +56,10 @@ class Grid(QFrame):
     def update(self, ebookList):
         self.delete()
         self.set(ebookList)
+
+    def search(self, text):
+        for name in self.widgets:
+            if text.lower() in name.lower():
+                self.widgets.get(name).show()
+            else:
+                self.widgets.get(name).hide()
