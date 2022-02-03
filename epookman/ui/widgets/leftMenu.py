@@ -81,15 +81,19 @@ class LeftMenu(QFrame):
         self.folders.setText("FOLDERS")
         self.folders.setCursor(QCursor(Qt.PointingHandCursor))
 
+        self.settings = QPushButton(self.topMenus)
+        self.settings.setMinimumSize(QSize(0, 50))
+        self.settings.setObjectName("leftmenu_button_settings")
+        self.settings.setText("SETTINGS")
+        self.settings.setCursor(QCursor(Qt.PointingHandCursor))
+
     def setLayoutes(self):
+        self.topMenusLayout.addWidget(self.folders)
         self.topMenusLayout.addWidget(self.reading)
         self.topMenusLayout.addWidget(self.toread)
         self.topMenusLayout.addWidget(self.done)
         self.topMenusLayout.addWidget(self.fav)
         self.topMenusLayout.addWidget(self.all)
-        self.topMenusLayout.addWidget(self.folders)
+        self.topMenusLayout.addWidget(self.settings)
 
         self.layout.addWidget(self.topMenus, 0, Qt.AlignTop)
-
-    def updateEbookPage(self, ebookListName):
-        print("Ebook list changed")

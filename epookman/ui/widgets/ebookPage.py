@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import (QFrame, QHBoxLayout, QLabel, QLineEdit,
                              QScrollArea, QVBoxLayout, QWidget)
 
 from epookman.api.db import DB_PATH, connect, fetch_ebooks
-from epookman.ui.widgets.grid import Grid
+from epookman.ui.widgets.listWidget import ListWidget
 from epookman.api.ebook import Ebook
 
 EBOOKPAGE_SEARCH_WIDTH = 300
@@ -31,7 +31,7 @@ class EbookPageContent(QFrame):
         self.layout.setObjectName("ebookpage_content_layout")
 
         self.setEbookList()
-        self.setGrid()
+        self.setListGrid()
         self.setScrollArea()
         self.setLayoutes()
         self.installEventFilter(self)
@@ -72,18 +72,18 @@ class EbookPageContent(QFrame):
         self.scrollAreaLayout.setObjectName("scrollAreaLayout")
 
     def setLayoutes(self):
-        self.scrollAreaLayout.addWidget(self.grid)
+        self.scrollAreaLayout.addWidget(self.listGrid)
         self.scrollArea.setWidget(self.scrollAreaContent)
 
         self.layout.addWidget(self.scrollArea)
 
-    def setGrid(self):
-        grid = Grid(self, self.ebookList)
-        self.grid = grid
+    def setListGrid(self):
+        listGrid = ListWidget(self, self.ebookList)
+        self.listGrid = listGrid
 
     def update(self):
         self.setEbookList()
-        self.grid.update(self.ebookList)
+        self.listGrid.update(self.ebookList)
 
 
 class EbookPage(QWidget):
@@ -101,11 +101,11 @@ class EbookPage(QWidget):
 
         self.setTopBar()
 
-        self.setLabels(name)
-        self.setInputs()
-
         content = EbookPageContent(self, name)
         self.setContent(content)
+
+        self.setLabels(name)
+        self.setInputs()
 
         self.setLayoutes()
 
@@ -143,10 +143,11 @@ class EbookPage(QWidget):
         self.content = content
 
     def setPageName(self, name):
+        name = "%s-%s" % (name, self.content.listGrid.count())
         self.pageName.setText(name)
 
     def searchHandler(self, text):
-        self.content.grid.search(text)
+        self.content.listGrid.search(text)
 
     def update(self, event):
         super().eventFilter(self, event)

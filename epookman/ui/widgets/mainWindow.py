@@ -79,6 +79,9 @@ class Ui_MainWindow(object):
         button = self.leftMenu.folders
         self.connectButton(button, leftMenufunc, "FOLDERS")
 
+        button = self.leftMenu.settings
+        self.connectButton(button, leftMenufunc, "SETTINGS")
+
     def connectButton(self, button, func, *args):
         button.setMouseTracking(True)
         button.mousePressEvent = lambda event: func(*args)

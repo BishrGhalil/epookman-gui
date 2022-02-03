@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import (QFrame, QStackedWidget, QVBoxLayout)
 
 from epookman.ui.widgets.ebookPage import EbookPage
 from epookman.ui.widgets.foldersPage import FoldersPage
+from epookman.ui.widgets.settingsPage import SettingsPage
 
 
 class Pages(QFrame):
@@ -41,12 +42,22 @@ class Pages(QFrame):
         self.pages["ALL"] = self.allPage
         self.pages["FAV"] = self.favPage
 
+    def setFolderPage(self):
+        folderPage = FoldersPage(self)
+        self.foldersPage = folderPage
+        self.pages["FOLDERS"] = self.foldersPage
+
+    def setSettingsPage(self):
+        settingsPage = SettingsPage(self)
+        self.settingsPage = settingsPage
+        self.pages["SETTINGS"] = self.settingsPage
+
     def setPages(self):
         self.pages = {}
 
         self.setEbookPages()
         self.setFolderPage()
-        self.pages["FOLDERS"] = self.foldersPage
+        self.setSettingsPage()
 
         for page in self.pages.values():
             self.stack.addWidget(page)
@@ -54,10 +65,6 @@ class Pages(QFrame):
     def setStack(self):
         self.stack = QStackedWidget(self)
         self.stack.setObjectName("pages_stack")
-
-    def setFolderPage(self):
-        folderPage = FoldersPage(self)
-        self.foldersPage = folderPage
 
     def changePage(self, name):
         page = self.pages[name]

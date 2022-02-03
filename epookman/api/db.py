@@ -100,7 +100,6 @@ def commit_dir(conn, Dir):
 def commit_ebooks(conn, ebooks):
     for ebook in ebooks:
         commit_ebook(conn, ebook)
-        conn.commit()
 
 
 def commit_ebook(conn, ebook):
@@ -113,6 +112,7 @@ def commit_ebook(conn, ebook):
         "TYPE, CATEGORY, STATUS, FAV, METADATA) " \
         "VALUES ((SELECT ID FROM EBOOKS WHERE NAME = ?), ?, ?, ?, ?, ?, ?, ?);",
         data)
+    conn.commit()
 
 
 def del_ebooks(conn, directory=None, name=None, category=None):

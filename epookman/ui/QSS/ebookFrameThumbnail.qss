@@ -1,8 +1,0 @@
-QFrame {
-  background-color: rgb(189, 147, 249);
-}
-
-QFrame:hover {
-  outline: 5px solid red;
-}
-

@@ -12,8 +12,7 @@ from os import (getenv, path, mkdir)
 
 from PyQt5 import (QtCore, QtGui, QtWidgets)
 from epookman.ui.widgets.mainWindow import (Ui_MainWindow)
-from epookman.api.db import *
-from epookman.api.search import scane_commit
+from epookman.api.db import (DB_PATH, connect, create_tables)
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -49,6 +48,9 @@ def main():
             exit(0)
 
     createDirs()
+    conn = connect(DB_PATH)
+    create_tables(conn)
+    conn.close()
     app = QtWidgets.QApplication(argv)
     window = MainWindow()
     return app.exec_()

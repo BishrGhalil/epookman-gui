@@ -33,6 +33,33 @@ def scane(dirs):
     return ebooks
 
 
+def searchOneByOne(path):
+    mime = Mime()
+    conn = connect(DB_PATH)
+    db_ebooks = fetch_ebooks(conn)
+    conn.close()
+
+    ebook_files = {ebook.path: True for ebook in db_ebooks}
+
+    Dir = Dirent(uri=path)
+    Dir.getfiles()
+    total = len(Dir.files)
+    for i, file in enumerate(Dir.files):
+        mime_type = mime.mime_type(file)
+        if mime_type != None:
+            if mime.is_ebook(mime_type) and not ebook_files.get(file):
+                ebook = Ebook()
+                ebook.set_path(file)
+                ebook.set_type(mime_type)
+                ebook.metadata = ebook.get_meta_data_string()
+                percent = int((100 * i) / total)
+                yield percent, ebook
+
+        else:
+            percent = int((100 * i + 1) / total)
+            yield percent, None
+
+
 def scane_commit(conn, dirs):
     ebooks = scane(dirs)
     commit_ebooks(conn, ebooks)

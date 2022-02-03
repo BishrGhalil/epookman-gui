@@ -3,24 +3,25 @@
 # This file is part of epookman, the console ebook manager.
 # License: MIT, see the file "LICENCS" for details.
 
-import subprocess
 from os import getenv, path
 
-from PyQt5.QtCore import QRect, QSize, Qt
-from PyQt5.QtGui import QBrush, QCursor, QIcon, QPalette, QPixmap
+from PyQt5.QtCore import (QRect, QSize, Qt)
+from PyQt5.QtGui import (QBrush, QCursor, QIcon, QPalette, QPixmap)
 from PyQt5.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton,
-                             QVBoxLayout)
+                             QVBoxLayout, QListWidgetItem)
 
 from epookman.api.db import DB_PATH, commit_ebook, connect
 from epookman.api.ebook import Ebook
 from epookman.api.thumbnailer import thumbnailer
 
 SCALE = 2
+PADDING_LR = 20
+PADDING_TB = 35
 EBOOKFRAME_THUMBNAIL_WIDTH = 99 * SCALE
 EBOOKFRAME_THUMBNAIL_HEIGHT = 128 * SCALE
 
-EBOOKFRAME_WIDTH = EBOOKFRAME_THUMBNAIL_WIDTH
-EBOOKFRAME_HEIGHT = EBOOKFRAME_THUMBNAIL_HEIGHT + 100
+EBOOKFRAME_WIDTH = EBOOKFRAME_THUMBNAIL_WIDTH + PADDING_LR
+EBOOKFRAME_HEIGHT = EBOOKFRAME_THUMBNAIL_HEIGHT + PADDING_TB
 
 EBOOKFRAME_WIDTH_MIN = EBOOKFRAME_THUMBNAIL_WIDTH
 EBOOKFRAME_HEIGHT_MIN = EBOOKFRAME_THUMBNAIL_HEIGHT + 100
@@ -94,21 +95,44 @@ class Button(QPushButton):
         self.mousePressEvent = lambda event: func(self, *args, event)
 
 
-class EmbtyFrame(QFrame):
+class EbookWidget(QListWidgetItem):
 
-    def __init__(self, QParent, parent=None):
+    def __init__(self, QParent, ebook, parent=None):
         super().__init__(QParent)
         self.parent = parent
+        self.ebook = ebook
+        self.setText(ebook.name)
+        self.setTextAlignment(Qt.AlignHCenter)
+        self.setThumbnail()
 
-        self.setGeometry(QRect(0, 0, EBOOKFRAME_WIDTH, EBOOKFRAME_HEIGHT))
-        self.setFrameShape(QFrame.NoFrame)
-        self.setFrameShadow(QFrame.Raised)
-        self.setObjectName("EmbtyFrame")
+        self.setSizeHint(QSize(EBOOKFRAME_WIDTH, EBOOKFRAME_HEIGHT))
 
-        self.layout = QVBoxLayout(self)
-        self.layout.setContentsMargins(0, 0, 0, 0)
-        self.layout.setSpacing(0)
-        self.layout.setObjectName("embty_layout")
+    def createThumbnail(self):
+        self.thumbnail_file = path.join(THUMBNAILS_DIR,
+                                        self.ebook.name + ".png")
+
+        if not path.lexists(self.thumbnail_file):
+            if thumbnailer(self.ebook.path,
+                           path.join(THUMBNAILS_DIR, self.ebook.name)) == 0:
+                return True
+            else:
+                return False
+
+        else:
+            return True
+
+    def setThumbnail(self):
+
+        if self.createThumbnail():
+            img = QPixmap(self.thumbnail_file)
+            scall = 3
+            img = img.scaled(EBOOKFRAME_THUMBNAIL_WIDTH * scall,
+                             EBOOKFRAME_THUMBNAIL_HEIGHT * scall)
+        else:
+            img = QPixmap("epookman/ui/resources/document.png")
+
+        self.setIcon(QIcon(img))
+
 
 
 class EbookFrame(QFrame):
@@ -242,14 +266,6 @@ class EbookFrame(QFrame):
         self.layout.addWidget(self.buttombar)
 
         self.setCursor(QCursor(Qt.PointingHandCursor))
-
-    def openEbook(self, event):
-        if event.button() == Qt.LeftButton:
-
-            ereader = "zathura"
-            file = open("/dev/null", "w")
-            subprocess.Popen([ereader, self.ebook.get_path()], stderr=file)
-            file.close()
 
     def markToread(self, button, event):
         if self.ebook.status == Ebook.STATUS_HAVE_READ:

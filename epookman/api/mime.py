@@ -43,3 +43,11 @@ class Mime():
         
         else:
             return False
+
+    
+    def is_ebook_from_path(self, file):
+        for ebook_type in self.re_ebooks_types.keys():
+            if re.search(ebook_type, file):
+                return self.re_ebooks_types.get(ebook_type)
+
+        return False

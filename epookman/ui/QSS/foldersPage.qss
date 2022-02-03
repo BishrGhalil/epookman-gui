@@ -1,4 +1,4 @@
 QLabel {
-  color: rgb(255, 184, 108);
-  font: bold 30px;
+  color: rgb(189, 147, 249);
+  font: bold 40px;
 }

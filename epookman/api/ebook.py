@@ -119,23 +119,26 @@ class Ebook():
         size = os.stat(path)
         size = "%.2f" % (size.st_size / (1024**2))
         data["File Size"] = size + "M"
-        if self.type == self.ebook_types.get("pdf"):
-            with open(path, "rb") as file:
-                pdfreader = PdfFileReader(file)
-                data["Encrypt"] = pdfreader.isEncrypted
-                if not data.get("Encrypt"):
-                    data["Pages"] = pdfreader.numPages
-                    info = pdfreader.documentInfo
-                    data["Creation"] = info.get('/CreationDate')
-                    data["Modification"] = info.get('/ModDate')
-                    data["Creators"] = info.get('/Creator')
+        try:
+            if self.type == self.ebook_types.get("pdf"):
+                with open(path, "rb") as file:
+                    pdfreader = PdfFileReader(file)
+                    data["Encrypt"] = pdfreader.isEncrypted
+                    if not data.get("Encrypt"):
+                        data["Pages"] = pdfreader.numPages
+                        info = pdfreader.documentInfo
+                        data["Creation"] = info.get('/CreationDate')
+                        data["Modification"] = info.get('/ModDate')
+                        data["Creators"] = info.get('/Creator')
 
-        elif self.type == self.ebook_types.get("epub"):
-            tmp_data = epub_meta.get_epub_metadata(path,
-                                                   read_cover_image=False,
-                                                   read_toc=False)
-            data["Creators"] = tmp_data.authors
-            data["Creation"] = tmp_data.publication_date
+            elif self.type == self.ebook_types.get("epub"):
+                tmp_data = epub_meta.get_epub_metadata(path,
+                                                       read_cover_image=False,
+                                                       read_toc=False)
+                data["Creators"] = tmp_data.authors
+                data["Creation"] = tmp_data.publication_date
+        except Exception as e:
+            data = dict()
 
         return data
 
