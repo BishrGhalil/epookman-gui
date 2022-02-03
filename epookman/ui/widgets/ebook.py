@@ -8,7 +8,7 @@ from os import getenv, path
 from PyQt5.QtCore import (QRect, QSize, Qt)
 from PyQt5.QtGui import (QBrush, QCursor, QIcon, QPalette, QPixmap)
 from PyQt5.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton,
-                             QVBoxLayout, QListWidgetItem)
+                             QVBoxLayout, QListWidgetItem, QMenu)
 
 from epookman.api.db import DB_PATH, commit_ebook, connect
 from epookman.api.ebook import Ebook
@@ -104,6 +104,7 @@ class EbookWidget(QListWidgetItem):
         self.setText(ebook.name)
         self.setTextAlignment(Qt.AlignHCenter)
         self.setThumbnail()
+        self.setToolTip(ebook.metadata)
 
         self.setSizeHint(QSize(EBOOKFRAME_WIDTH, EBOOKFRAME_HEIGHT))
 
@@ -132,7 +133,6 @@ class EbookWidget(QListWidgetItem):
             img = QPixmap("epookman/ui/resources/document.png")
 
         self.setIcon(QIcon(img))
-
 
 
 class EbookFrame(QFrame):

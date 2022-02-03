@@ -143,7 +143,7 @@ class EbookPage(QWidget):
         self.content = content
 
     def setPageName(self, name):
-        name = "%s-%s" % (name, self.content.listGrid.count())
+        name = "%s" % (name)
         self.pageName.setText(name)
 
     def searchHandler(self, text):

@@ -127,6 +127,12 @@ def del_ebooks(conn, directory=None, name=None, category=None):
     conn.commit()
 
 
+def del_dir(conn, path):
+    cur = conn.cursor()
+    cur.execute(f"DELETE FROM DIRS WHERE PATH='{path}'")
+    conn.commit()
+
+
 # Fetching functions
 
 

@@ -6,10 +6,10 @@ from PyQt5.QtCore import (QRect, QSize, Qt, QThread, pyqtSignal)
 from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import (QFileDialog, QFrame, QHBoxLayout, QLabel,
                              QListView, QListWidget, QPushButton, QScrollArea,
-                             QVBoxLayout, QWidget, QProgressBar)
+                             QVBoxLayout, QWidget, QProgressBar, QMessageBox)
 
 from epookman.api.db import (DB_PATH, commit_dir, commit_ebook, connect,
-                             fetch_dirs)
+                             fetch_dirs, del_dir, del_ebooks)
 from epookman.api.dirent import Dirent
 from epookman.api.search import searchOneByOne
 
@@ -51,7 +51,7 @@ class Content(QFrame):
         self.layout.setObjectName("settings_content_layout")
         self.layout.setContentsMargins(30, 0, 30, 0)
 
-        self.dirs = []
+        self.dirs = {}
 
         self.setScrollArea()
         self.setDirsControleFrame()
@@ -60,6 +60,7 @@ class Content(QFrame):
         self.setProgressBars()
         self.setList()
         self.setLayoutes()
+        self.list.itemDoubleClicked.connect(self.showDelDialog)
 
     def setScrollArea(self):
         self.scrollArea = QScrollArea(self)
@@ -80,7 +81,6 @@ class Content(QFrame):
         self.scaneFrameLayout.addWidget(self.vpbar)
 
         self.buttonsLayout.addWidget(self.addDir)
-        self.buttonsLayout.addWidget(self.delDir)
 
         self.dirsControleFrameLayout.addWidget(self.list)
         self.dirsControleFrameLayout.addWidget(self.buttons)
@@ -128,13 +128,6 @@ class Content(QFrame):
         self.addDir.setCursor(QCursor(Qt.PointingHandCursor))
         self.addDir.clicked.connect(self.addDirUpdateList)
 
-        self.delDir = QPushButton(self.buttons)
-        self.delDir.setMinimumSize(QSize(16777215, 50))
-        self.delDir.setObjectName("delDir")
-        self.delDir.setText("DEL DIR")
-        self.delDir.setCursor(QCursor(Qt.PointingHandCursor))
-        self.delDir.clicked.connect(self.delDirUpdateList)
-
     def setProgressBars(self):
         self.vpbar = QProgressBar(self.buttons)
         self.vpbar.setMinimumSize(QSize(100, 10))
@@ -162,7 +155,7 @@ class Content(QFrame):
         self.dpbar.resetFormat()
         self.vpbar.resetFormat()
         self.scane.setEnabled(False)
-        self.thread = scaneThread(self.dirs)
+        self.thread = scaneThread(list(self.dirs.keys()))
         self.thread._currentValueSignal.connect(self.updateVProgressBar)
         self.thread._currentDirSignal.connect(self.updateDProgressBar)
         self.thread.start()
@@ -180,13 +173,28 @@ class Content(QFrame):
         conn.close()
         self.updateList()
 
-    def delDirUpdateList(self):
-        if not dirPath:
+    def showDelDialog(self, item):
+        msgBox = QMessageBox()
+        msgBox.setIcon(QMessageBox.Critical)
+        msgBox.setText(
+            "Are you sure you want to delete this directory?\n" \
+            "This action will also delete all ebooks that belong to this directory"
+        )
+        msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
+        msgBox.buttonClicked.connect(
+            lambda button: self.delDirUpdateList(button, item))
+
+        retval = msgBox.exec_()
+
+    def delDirUpdateList(self, button, item):
+        if button.text() != "&Yes":
             return
 
         conn = connect(DB_PATH)
-        Dir = Dirent(dirPath)
-        commit_dir(conn, Dir)
+        dirPath = item.text()
+        del_dir(conn, dirPath)
+        del_ebooks(conn, directory=dirPath)
+        self.dirs.pop(dirPath, None)
         conn.close()
         self.updateList()
 
@@ -196,7 +204,7 @@ class Content(QFrame):
         conn.close()
 
         for _dir in dirs:
-            self.dirs.append(_dir.path)
+            self.dirs[_dir.path] = _dir
             self.list.addItem(_dir.path)
 
     def updateList(self):

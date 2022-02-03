@@ -29,17 +29,6 @@ QPushButton#addDir:hover {
 }
 
 
-QPushButton#delDir {
-  color: rgb(255, 85, 85);
-}
-
-QPushButton#delDir:hover {
-  color: rgb(59, 62, 80);
-  background-color: rgb(255, 85, 85);
-}
-
-
-
 QListWidget {
   border: 2px solid rgb(68, 71, 90);
   color: rgb(255, 184, 108);
