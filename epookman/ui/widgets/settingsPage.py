@@ -33,7 +33,7 @@ class scaneThread(QThread):
                 if ebook:
                     commit_ebook(conn, ebook)
 
-                self._currentValueSignal.emit(percent)
+                self._currentValueSignal.emit(percent + 1)
 
         self._currentValueSignal.emit(100)
         self._currentDirSignal.emit(100)
@@ -179,20 +179,24 @@ class Content(QFrame):
         self.scaneUpdateProgressBar((dirPath, ))
 
     def showDelDialog(self, item):
-        msgBox = QMessageBox()
-        msgBox.setIcon(QMessageBox.Critical)
-        msgBox.setText(
-            "Are you sure you want to delete this directory?\n" \
+        msg = "Are you sure you want to delete this directory?\n" \
             "This action will also delete all ebooks that belong to this directory"
-        )
-        msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
-        msgBox.buttonClicked.connect(
-            lambda button: self.delDirUpdateList(button, item))
+
+        func = lambda button: self.delDirUpdateList(button, item)
+        self.showDialog(msg, func)
+
+    def showDialog(self, text, func=None):
+        msgBox = QMessageBox()
+        msgBox.setIcon(QMessageBox.Information)
+        msgBox.setText(text)
+        msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        if func:
+            msgBox.buttonClicked.connect(lambda button: func(button))
 
         retval = msgBox.exec_()
 
     def delDirUpdateList(self, button, item):
-        if button.text() != "&Yes":
+        if button.text() != "OK":
             return
 
         conn = connect(DB_PATH)

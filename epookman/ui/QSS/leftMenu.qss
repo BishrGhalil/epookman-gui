@@ -17,9 +17,24 @@ QPushButton {
   border: 0px solid;
   font-size: 20px;
   font-style: bold;
+  padding: 15px;
 }
 
 QPushButton:hover {
   color: rgb(68, 71, 90);
   background-color: rgb(85, 170, 255);
+}
+
+QPushButton#leftmenu_button_toggle:hover {
+  background-color: rgb(68, 71, 90);
+}
+
+
+QToolTip {
+  font: 18px;
+  color: rgb(255, 121, 198);
+  background-color: rgb(35, 37, 49);
+  border: 0px solid;
+  margin: 5px;
+  text-align: center; 
 }

@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 # This file is part of epookman, the console ebook manager.
 # License: MIT, see the file "LICENCS" for details.
-from PyQt5.QtCore import QCoreApplication, QSize
-from PyQt5.QtWidgets import QFrame, QHBoxLayout, QVBoxLayout, QWidget
+from PyQt5.QtCore import (QCoreApplication, QSize)
+from PyQt5.QtWidgets import (QFrame, QHBoxLayout, QVBoxLayout, QWidget, QMessageBox)
 from epookman.ui.widgets.leftMenu import LeftMenu
 from epookman.ui.widgets.pages import Pages
 
@@ -15,6 +15,8 @@ MAINWINDOW_HEIGHT = 700
 
 DEFAULT_PAGE = "ALL"
 
+MESSAGEBOX_WIDTH = 200
+MESSAGEBOX_HEIGHT = 100
 
 class Ui_MainWindow(object):
 
@@ -55,7 +57,10 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.setButtons()
-        self.setDefaultPage()
+        if self.pages.settingsPage.content.dirs:
+            self.setDefaultPage("ALL")
+        else:
+            self.setDefaultPage("SETTINGS")
 
     def setButtons(self):
         # LEFT MENU BUTTONS
@@ -95,5 +100,7 @@ class Ui_MainWindow(object):
                 "<html><head/><body><p align=\"center\"><span style=\" font-size:15pt;\">EPOOKMAN</span></p></body></html>"
             ))
 
-    def setDefaultPage(self):
-        self.pages.changePage(DEFAULT_PAGE)
+    def setDefaultPage(self, name=None):
+        if not name:
+            name = DEFAULT_PAGE
+        self.pages.changePage(name)
