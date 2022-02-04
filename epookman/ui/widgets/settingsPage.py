@@ -2,14 +2,14 @@
 # -*- coding: utf-8 -*-
 from os import getenv, path
 
-from PyQt5.QtCore import (QRect, QSize, Qt, QThread, pyqtSignal)
+from PyQt5.QtCore import QRect, QSize, Qt, QThread, pyqtSignal
 from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import (QFileDialog, QFrame, QHBoxLayout, QLabel,
-                             QListView, QListWidget, QPushButton, QScrollArea,
-                             QVBoxLayout, QWidget, QProgressBar, QMessageBox)
+                             QListView, QListWidget, QMessageBox, QProgressBar,
+                             QPushButton, QScrollArea, QVBoxLayout, QWidget)
 
 from epookman.api.db import (DB_PATH, commit_dir, commit_ebook, connect,
-                             fetch_dirs, del_dir, del_ebooks)
+                             del_dir, del_ebooks, fetch_dirs)
 from epookman.api.dirent import Dirent
 from epookman.api.search import searchOneByOne
 
@@ -27,12 +27,12 @@ class scaneThread(QThread):
         conn = connect(DB_PATH)
         totalDirs = len(self.dirs)
         for index, _dir in enumerate(self.dirs):
+            dirPercent = int(((index) / (totalDirs)) * 100)
+            self._currentDirSignal.emit(dirPercent)
             for percent, ebook in searchOneByOne(_dir):
                 if ebook:
                     commit_ebook(conn, ebook)
 
-                dirPercent = int((100 * index + 1) / totalDirs)
-                self._currentDirSignal.emit(dirPercent)
                 self._currentValueSignal.emit(percent)
 
         self._currentValueSignal.emit(100)
@@ -117,7 +117,7 @@ class Content(QFrame):
         self.scane = QPushButton(self.buttons)
         self.scane.setMinimumSize(QSize(16777215, 50))
         self.scane.setObjectName("scane")
-        self.scane.setText("SCANE")
+        self.scane.setText("RESCANE")
         self.scane.setCursor(QCursor(Qt.PointingHandCursor))
         self.scane.clicked.connect(self.scaneUpdateProgressBar)
 
@@ -126,7 +126,7 @@ class Content(QFrame):
         self.addDir.setObjectName("addDir")
         self.addDir.setText("ADD DIR")
         self.addDir.setCursor(QCursor(Qt.PointingHandCursor))
-        self.addDir.clicked.connect(self.addDirUpdateList)
+        self.addDir.clicked.connect(self.addDirScane)
 
     def setProgressBars(self):
         self.vpbar = QProgressBar(self.buttons)
@@ -136,6 +136,7 @@ class Content(QFrame):
         self.dpbar = QProgressBar(self.buttons)
         self.dpbar.setMinimumSize(QSize(100, 10))
         self.dpbar.setObjectName("dirs_progressbar")
+        self.dpbar.setFormat("%v/%m")
 
     def setList(self):
         self.list = QListWidget(self.dirsControleFrame)
@@ -148,19 +149,22 @@ class Content(QFrame):
 
         self.setListItems()
 
-    def scaneUpdateProgressBar(self):
-        if not self.dirs:
-            return
+    def scaneUpdateProgressBar(self, dirs=None):
+        if not dirs:
+            if not self.dirs:
+                return
 
-        self.dpbar.resetFormat()
+            dirs = list(self.dirs.keys())
+
+        self.dpbar.setFormat("%v/%m")
         self.vpbar.resetFormat()
         self.scane.setEnabled(False)
-        self.thread = scaneThread(list(self.dirs.keys()))
+        self.thread = scaneThread(dirs)
         self.thread._currentValueSignal.connect(self.updateVProgressBar)
         self.thread._currentDirSignal.connect(self.updateDProgressBar)
         self.thread.start()
 
-    def addDirUpdateList(self):
+    def addDirScane(self):
         documentsPath = path.join(getenv("HOME"), "Documents")
         dirPath = QFileDialog.getExistingDirectory(self, "Choose A Directory",
                                                    documentsPath)
@@ -172,6 +176,7 @@ class Content(QFrame):
         commit_dir(conn, Dir)
         conn.close()
         self.updateList()
+        self.scaneUpdateProgressBar((dirPath, ))
 
     def showDelDialog(self, item):
         msgBox = QMessageBox()
@@ -215,14 +220,14 @@ class Content(QFrame):
         self.vpbar.setValue(int(msg))
         if self.vpbar.value() >= 99:
             self.vpbar.setValue(0)
-            self.vpbar.setFormat("Done")
+            self.vpbar.setFormat("")
 
     def updateDProgressBar(self, msg):
         self.dpbar.setValue(int(msg))
         if self.dpbar.value() >= 99:
             self.dpbar.setValue(0)
             self.scane.setEnabled(True)
-            self.dpbar.setFormat("Done")
+            self.dpbar.setFormat("")
 
 
 class SettingsPage(QWidget):

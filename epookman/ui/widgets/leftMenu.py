@@ -88,12 +88,12 @@ class LeftMenu(QFrame):
         self.settings.setCursor(QCursor(Qt.PointingHandCursor))
 
     def setLayoutes(self):
+        self.topMenusLayout.addWidget(self.all)
+        self.topMenusLayout.addWidget(self.fav)
         self.topMenusLayout.addWidget(self.folders)
         self.topMenusLayout.addWidget(self.reading)
         self.topMenusLayout.addWidget(self.toread)
         self.topMenusLayout.addWidget(self.done)
-        self.topMenusLayout.addWidget(self.fav)
-        self.topMenusLayout.addWidget(self.all)
         self.topMenusLayout.addWidget(self.settings)
 
         self.layout.addWidget(self.topMenus, 0, Qt.AlignTop)

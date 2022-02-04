@@ -45,6 +45,7 @@ def searchOneByOne(path):
     Dir.getfiles()
     total = len(Dir.files)
     for i, file in enumerate(Dir.files):
+        percent = int(((i - 1) / (total - 1)) * 100)
         mime_type = mime.mime_type(file)
         if mime_type != None:
             if mime.is_ebook(mime_type) and not ebook_files.get(file):
@@ -52,11 +53,9 @@ def searchOneByOne(path):
                 ebook.set_path(file)
                 ebook.set_type(mime_type)
                 ebook.metadata = ebook.get_meta_data_string()
-                percent = int((100 * i) / total)
                 yield percent, ebook
 
         else:
-            percent = int((100 * i + 1) / total)
             yield percent, None
 
 
