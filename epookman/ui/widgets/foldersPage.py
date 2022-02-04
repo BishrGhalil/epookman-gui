@@ -36,6 +36,9 @@ class Content(QFrame):
     def setLayoutes(self):
         self.layout.addWidget(self.scrollArea)
 
+    def setButtons(self):
+        pass
+
 
 class FoldersPage(QWidget):
 
