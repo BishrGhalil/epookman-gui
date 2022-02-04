@@ -39,6 +39,7 @@ class LeftMenu(QFrame):
         self.setTopMenusFrame()
         self.setButtons()
         self.setLayoutes()
+        self.setAnimations()
         self.toggleButtonsVisbilaty(LEFTMENU_EXTENDED)
 
     def setTopMenusFrame(self):
@@ -134,6 +135,11 @@ class LeftMenu(QFrame):
 
         self.layout.addWidget(self.topMenus, 0, Qt.AlignTop)
 
+    def setAnimations(self):
+        self.widthAnimation = QPropertyAnimation(self, b"minimumWidth")
+        self.widthAnimation.setDuration(150)
+        self.widthAnimation.setEasingCurve(QEasingCurve.InOutQuart)
+
     def toggleAnimate(self):
         width = self.width()
 
@@ -146,11 +152,8 @@ class LeftMenu(QFrame):
 
         self.toggleButtonsVisbilaty(visible)
 
-        self.widthAnimation = QPropertyAnimation(self, b"minimumWidth")
-        self.widthAnimation.setDuration(250)
         self.widthAnimation.setStartValue(width)
         self.widthAnimation.setEndValue(newWidth)
-        self.widthAnimation.setEasingCurve(QEasingCurve.InOutQuart)
         self.widthAnimation.start()
 
     def toggleButtonsVisbilaty(self, visible):
