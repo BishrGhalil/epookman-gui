@@ -90,6 +90,7 @@ class EbookPage(QWidget):
 
     def __init__(self, name, parent=None):
         super().__init__()
+        self.nameString = name
         self.setObjectName("pages_ebookpage")
         self.parent = parent
         self.layout = QVBoxLayout(self)
@@ -122,7 +123,7 @@ class EbookPage(QWidget):
 
     def setLabels(self, name):
         self.pageName = QLabel(self.topbar)
-        self.pageName.setObjectName("ebookpage_pagename")
+        self.pageName.setObjectName("ebookpage_pagename_%s" % name)
         self.setPageName(name)
 
     def setInputs(self):
@@ -143,11 +144,12 @@ class EbookPage(QWidget):
         self.content = content
 
     def setPageName(self, name):
-        name = "%s" % (name)
+        name = "%s - %s" % (name, self.content.listGrid.count())
         self.pageName.setText(name)
 
     def searchHandler(self, text):
         self.content.listGrid.search(text)
 
-    def update(self, event):
-        super().eventFilter(self, event)
+    def update(self):
+        self.content.update()
+        self.setPageName(self.nameString)
