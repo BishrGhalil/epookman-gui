@@ -7,7 +7,7 @@ uninstall:
 	rm -rf /usr/bin/epookman
 
 run:
-	python3 epookman.py
+	python3 epookman-gui.py
 
 clean:
 	find epookman -depth -name __pycache__ -type d -exec rm -r -- {} \;
