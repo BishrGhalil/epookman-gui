@@ -1,12 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from os import path
+from os import (path, getenv)
 
-from epookman.api.db import DB_PATH, commit_ebooks, connect, fetch_ebooks
+from epookman.api.db import (DB_PATH, commit_ebooks, connect, fetch_ebooks)
 from epookman.api.ebook import Ebook
 from epookman.api.mime import Mime
 from epookman.api.dirent import Dirent
+from epookman.api.thumbnailer import thumbnailer
+
+THUMBNAILS_DIR = path.join(getenv("HOME"), ".cache", "epookman-gui",
+                           "thumbnails")
 
 
 def scane(dirs):
@@ -28,12 +32,13 @@ def scane(dirs):
                     ebook = Ebook()
                     ebook.set_path(file)
                     ebook.set_type(mime_type)
+                    ebook.set_parent_folder(Dir.path)
                     ebook.metadata = ebook.get_meta_data_string()
                     ebooks.append(ebook)
     return ebooks
 
 
-def searchOneByOne(path):
+def scaneOneByOne(dirPath):
     mime = Mime()
     conn = connect(DB_PATH)
     db_ebooks = fetch_ebooks(conn)
@@ -41,7 +46,7 @@ def searchOneByOne(path):
 
     ebook_files = {ebook.path: True for ebook in db_ebooks}
 
-    Dir = Dirent(uri=path)
+    Dir = Dirent(uri=dirPath)
     Dir.getfiles()
     total = len(Dir.files)
     for i, file in enumerate(Dir.files):
@@ -52,7 +57,9 @@ def searchOneByOne(path):
                 ebook = Ebook()
                 ebook.set_path(file)
                 ebook.set_type(mime_type)
+                ebook.set_parent_folder(dirPath)
                 ebook.metadata = ebook.get_meta_data_string()
+                thumbnailer(ebook.path, path.join(THUMBNAILS_DIR, ebook.name))
                 yield percent, ebook
 
         else:

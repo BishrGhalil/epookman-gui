@@ -19,6 +19,10 @@ EBOOK_TYPE_XPS = 3
 EBOOK_TYPE_CBR = 4
 EBOOK_TYPE_CBZ = 5
 
+STATUS_HAVE_NOT_READ = 0
+STATUS_READING = 1
+STATUS_HAVE_READ = 2
+
 
 class Ebook():
     STATUS_HAVE_NOT_READ = 0
@@ -55,11 +59,9 @@ class Ebook():
         self.metadata = metadata
 
     def set_path(self, path):
+        self.path = path
         self.folder = os.path.dirname(path)
         self.name = os.path.basename(path)
-
-    def toggle_fav(self):
-        self.fav = not self.fav
 
     def set_status(self, status):
         self.status = status
@@ -75,6 +77,24 @@ class Ebook():
                     return
         else:
             self.type = _type if _type in self.ebook_types.values() else None
+
+    def set_fav(self, fav):
+        self.fav = fav
+
+    def set_name(self, name):
+        self.name = name
+
+    def set_folder(self, folder):
+        self.folder = folder
+
+    def set_parent_folder(self, parent_folder):
+        self.parent_folder = parent_folder
+
+    def set_metadata(self, metadata):
+        self.metadata = metadata
+
+    def toggle_fav(self):
+        self.fav = not self.fav
 
     def get_path(self):
         uri = os.path.join(self.folder, self.name)

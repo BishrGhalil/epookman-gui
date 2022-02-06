@@ -12,17 +12,15 @@ from PyQt5.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton,
                              QVBoxLayout, QListWidgetItem, QMenu)
 
 from epookman.api.db import DB_PATH, commit_ebook, connect
-from epookman.api.ebook import Ebook
+from epookman.api.ebook import (STATUS_HAVE_READ, STATUS_HAVE_NOT_READ, STATUS_READING)
 from epookman.api.thumbnailer import thumbnailer
 
 SCALE = 2
-PADDING_LR = 0
-PADDING_TB = 0
 EBOOKFRAME_THUMBNAIL_WIDTH = 99 * SCALE
 EBOOKFRAME_THUMBNAIL_HEIGHT = 128 * SCALE
 
-EBOOKFRAME_WIDTH = EBOOKFRAME_THUMBNAIL_WIDTH + PADDING_LR
-EBOOKFRAME_HEIGHT = EBOOKFRAME_THUMBNAIL_HEIGHT + PADDING_TB
+EBOOKFRAME_WIDTH = EBOOKFRAME_THUMBNAIL_WIDTH
+EBOOKFRAME_HEIGHT = EBOOKFRAME_THUMBNAIL_HEIGHT
 
 EBOOKFRAME_BUTTONS_ICON = 40
 EBOOKFRAME_BUTTONS_HEIGHT = EBOOKFRAME_BUTTONS_ICON
@@ -32,7 +30,6 @@ EBOOKFRAME_WIDTH_MIN = EBOOKFRAME_THUMBNAIL_WIDTH
 EBOOKFRAME_HEIGHT_MIN = EBOOKFRAME_THUMBNAIL_HEIGHT + EBOOKFRAME_BUTTONS_HEIGHT
 THUMBNAILS_DIR = path.join(getenv("HOME"), ".cache", "epookman-gui",
                            "thumbnails")
-
 
 class Button(QPushButton):
 
@@ -138,32 +135,27 @@ class EbookFrame(QFrame):
         self.mousePressEvent = lambda event: self.openEbook(event, ebook)
         self.name = ebook.name
 
-    def createThumbnail(self):
-        self.thumbnail_file = path.join(THUMBNAILS_DIR,
-                                        self.ebook.name + ".png")
-
+    def existsThumbnail(self):
         if not path.lexists(self.thumbnail_file):
-            if thumbnailer(self.ebook.path,
-                           path.join(THUMBNAILS_DIR, self.ebook.name)) == 0:
-                return True
-            else:
-                return False
+            return False
 
         else:
             return True
 
     def setThumbnail(self):
+
+        self.thumbnail_file = path.join(THUMBNAILS_DIR,
+                                        self.ebook.name + ".png")
         self.thumbnail = QFrame(self)
 
         self.thumbnail.setMaximumSize(
             QSize(EBOOKFRAME_THUMBNAIL_WIDTH, EBOOKFRAME_THUMBNAIL_HEIGHT))
-        self.thumbnail.setLayoutDirection(Qt.LeftToRight)
         self.thumbnail.setToolTip(self.ebook.metadata)
         self.thumbnail.setFrameShape(QFrame.NoFrame)
         self.thumbnail.setFrameShadow(QFrame.Raised)
         self.thumbnail.setObjectName("ebook_thumbnail_%s" % self.ebook.name)
 
-        if self.createThumbnail():
+        if self.existsThumbnail():
             img = QPixmap(self.thumbnail_file)
         else:
             img = QPixmap("epookman/ui/resources/document.png")
@@ -189,7 +181,7 @@ class EbookFrame(QFrame):
         # == Making buttons ==
         # To_Read button
         buttonState = False
-        if self.ebook.status == Ebook.STATUS_HAVE_NOT_READ:
+        if self.ebook.status == STATUS_HAVE_NOT_READ:
             buttonState = True
         self.toread = Button("toread", buttonState, "epookman/ui/resources",
                              "Mark as To Read", self.markToread, self.buttons)
@@ -203,7 +195,7 @@ class EbookFrame(QFrame):
 
         # Done button
         buttonState = False
-        if self.ebook.status == Ebook.STATUS_HAVE_READ:
+        if self.ebook.status == STATUS_HAVE_READ:
             buttonState = True
         self.done = Button("done", buttonState, "epookman/ui/resources",
                            "Mark as Done", self.markDone, self.buttons)
@@ -220,11 +212,11 @@ class EbookFrame(QFrame):
         self.setCursor(QCursor(Qt.PointingHandCursor))
 
     def markToread(self, button, event):
-        if self.ebook.status == Ebook.STATUS_HAVE_READ:
+        if self.ebook.status == STATUS_HAVE_READ:
             self.toggleIcon(self.done, False)
 
         self.toggleIcon(button, True)
-        self.ebook.set_status(Ebook.STATUS_HAVE_NOT_READ)
+        self.ebook.set_status(STATUS_HAVE_NOT_READ)
         self.commit()
 
         self.updateFrame(event)
@@ -238,14 +230,18 @@ class EbookFrame(QFrame):
         self.updateFrame(event)
 
     def markDone(self, button, event):
-        if self.ebook.status == Ebook.STATUS_HAVE_NOT_READ:
+        if self.ebook.status == STATUS_HAVE_NOT_READ:
             self.toggleIcon(self.toread, False)
 
         self.toggleIcon(button, True)
-        self.ebook.set_status(Ebook.STATUS_HAVE_READ)
+        self.ebook.set_status(STATUS_HAVE_READ)
         self.commit()
 
         self.updateFrame(event)
+
+    def markReading(self):
+        self.ebook.set_status(STATUS_READING)
+        self.commit()
 
     def toggleIcon(self, button, status):
         if status:
@@ -281,3 +277,4 @@ class EbookFrame(QFrame):
             file = open("/dev/null", "w")
             subprocess.Popen([ereader, ebook.get_path()], stderr=file)
             file.close()
+            self.markReading()

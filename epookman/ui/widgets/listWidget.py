@@ -10,7 +10,6 @@ from epookman.ui.widgets.ebook import EbookFrame, EbookListWidgetItem
 
 ITEMS_SPACING = 25
 
-
 class ListWidget(QListWidget):
 
     def __init__(self, QParent, ebookList, parent=None):
@@ -29,8 +28,7 @@ class ListWidget(QListWidget):
 
     def set(self, ebookList):
         self.widgets = dict()
-        self.list = ebookList
-        for ebook in self.list:
+        for ebook in ebookList:
             w = EbookFrame(self, ebook)
             i = EbookListWidgetItem(self, ebook)
             self.addItem(i)

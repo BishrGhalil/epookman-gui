@@ -44,8 +44,9 @@ def create_ebooks_table(conn):
     cur.execute(
         "CREATE TABLE IF NOT EXISTS EBOOKS(" \
         "ID INTEGER PRIMARY KEY AUTOINCREMENT," \
-        "FOLDER         TEXT    NOT NULL," \
         "NAME           TEXT    NOT NULL," \
+        "FOLDER         TEXT    NOT NULL," \
+        "PARENT_FOLDER  TEXT    NOT NULL," \
         "TYPE           INT    NOT NULL," \
         "CATEGORY       TEXT," \
         "STATUS         INT," \
@@ -104,13 +105,14 @@ def commit_ebooks(conn, ebooks):
 
 def commit_ebook(conn, ebook):
     cur = conn.cursor()
-    data = (ebook.name, ebook.folder, ebook.name, ebook.type, ebook.category,
-            ebook.status, ebook.fav, ebook.metadata)
+    data = (ebook.name, ebook.name, ebook.folder, ebook.parent_folder,
+            ebook.type, ebook.category, ebook.status, ebook.fav,
+            ebook.metadata)
     cur.execute(
         "INSERT OR REPLACE "\
-        "INTO EBOOKS (ID, FOLDER, NAME, " \
+        "INTO EBOOKS (ID, NAME, FOLDER, PARENT_FOLDER, " \
         "TYPE, CATEGORY, STATUS, FAV, METADATA) " \
-        "VALUES ((SELECT ID FROM EBOOKS WHERE NAME = ?), ?, ?, ?, ?, ?, ?, ?);",
+        "VALUES ((SELECT ID FROM EBOOKS WHERE NAME = ?), ?, ?, ?, ?, ?, ?, ?, ?);",
         data)
     conn.commit()
 
@@ -118,7 +120,7 @@ def commit_ebook(conn, ebook):
 def del_ebooks(conn, directory=None, name=None, category=None):
     cur = conn.cursor()
     if directory:
-        cur.execute(f"DELETE FROM EBOOKS WHERE FOLDER LIKE '{directory}%';")
+        cur.execute(f"DELETE FROM EBOOKS WHERE PARENT_FOLDER = '{directory}';")
     elif name:
         cur.execute(f"DELETE FROM EBOOKS WHERE NAME LIKE '{name}';")
     elif category:
@@ -157,13 +159,16 @@ def fetch_ebooks(conn, key="*", where=None, sort_clause=None):
         if len(row) == 1:
             ebooks.append(row[0])
         else:
-            ebook = Ebook(folder=row[1],
-                          name=row[2],
-                          ebook_type=row[3],
-                          category=row[4],
-                          status=row[5],
-                          fav=row[6],
-                          metadata=row[7])
+            ebook = Ebook()
+            ebook.set_name(row[1])
+            ebook.set_folder(row[2])
+            ebook.set_parent_folder(row[3])
+            ebook.set_path(ebook.get_path())
+            ebook.set_type(row[4])
+            ebook.set_category(row[5])
+            ebook.set_status(row[6])
+            ebook.set_fav(row[7])
+            ebook.set_metadata(row[8])
             ebooks.append(ebook)
 
     return ebooks

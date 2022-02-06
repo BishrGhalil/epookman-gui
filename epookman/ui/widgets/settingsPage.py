@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import (QFileDialog, QFrame, QHBoxLayout, QLabel,
 from epookman.api.db import (DB_PATH, commit_dir, commit_ebook, connect,
                              del_dir, del_ebooks, fetch_dirs)
 from epookman.api.dirent import Dirent
-from epookman.api.search import searchOneByOne
+from epookman.api.search import scaneOneByOne
 
 
 class scaneThread(QThread):
@@ -29,7 +29,7 @@ class scaneThread(QThread):
         for index, _dir in enumerate(self.dirs):
             dirPercent = int(((index) / (totalDirs)) * 100)
             self._currentDirSignal.emit(dirPercent)
-            for percent, ebook in searchOneByOne(_dir):
+            for percent, ebook in scaneOneByOne(_dir):
                 if ebook:
                     commit_ebook(conn, ebook)
 
