@@ -2,9 +2,14 @@
 # -*- coding: utf-8 -*-
 # This file is part of epookman_gui, the console ebook manager.
 # License: MIT, see the file "LICENCS" for details.
-from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtWidgets import (QFrame, QLabel, QListView, QListWidget,
-                             QListWidgetItem)
+
+# TODO: Maybe change to QListView
+import subprocess
+
+from PyQt5.QtCore import (QEvent, QSize, Qt)
+from PyQt5.QtGui import QCursor
+from PyQt5.QtWidgets import (QAction, QFrame, QListView, QListWidget,
+                             QListWidgetItem, QMenu)
 from timeIt import timeIt
 
 from epookman_gui.ui.widgets.ebook import (THUMBNAIL_HEIGHT, THUMBNAIL_WIDTH,
@@ -27,9 +32,45 @@ class ListWidget(QListWidget):
         self.setResizeMode(QListWidget.Adjust)
         self.setSpacing(ITEMS_SPACING)
         self.setIconSize(QSize(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT))
+        self.installEventFilter(self)
+        self.itemDoubleClicked.connect(self.openEbook)
 
         with open("epookman_gui/ui/QSS/listWidget.qss", "r") as f:
             self.setStyleSheet(f.read())
+
+    def eventFilter(self, source, event):
+        if event.type() == QEvent.ContextMenu and source is self:
+            menu = QMenu()
+            with open("epookman_gui/ui/QSS/contextMenu.qss", "r") as f:
+                menu.setStyleSheet(f.read())
+
+            menu.setCursor(QCursor(Qt.PointingHandCursor))
+            toggleFav = QAction("Toggle Fav")
+            markAsToRead = QAction("Mark as: To Read")
+            markAsDone = QAction("Mark as: Done")
+
+            menu.addAction(toggleFav)
+            menu.addAction(markAsToRead)
+            menu.addAction(markAsDone)
+
+            menu_click = menu.exec_(event.globalPos())
+            item = source.itemAt(event.pos())
+            if not item:
+                return False
+
+            if menu_click == toggleFav:
+                item.markFav()
+                return True
+
+            elif menu_click == markAsDone:
+                item.markDone()
+                return True
+
+            elif menu_click == markAsToRead:
+                item.markToRead()
+                return True
+
+        return super(ListWidget, self).eventFilter(source, event)
 
     def checkEbookItem(self, ebook):
         if self.items.get(ebook.name):
@@ -40,6 +81,7 @@ class ListWidget(QListWidget):
     def createAddItem(self, ebook):
         item = EbookItem(self, ebook)
         self.addItem(item)
+
         self.items[ebook.name] = item
         self.itemsSet.add(ebook.name)
 
@@ -82,3 +124,9 @@ class ListWidget(QListWidget):
                 item.show()
             else:
                 item.hide()
+
+    def openEbook(self, item):
+        ereader = "zathura"
+        errFile = open("/dev/null", "w")
+        subprocess.Popen([ereader, item.ebook.path], stderr=errFile)
+        item.markReading()

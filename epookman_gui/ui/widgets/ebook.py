@@ -6,13 +6,12 @@
 import subprocess
 from os import getenv, path
 
-from PyQt5.QtCore import (QRect, QSize, Qt)
-from PyQt5.QtGui import (QBrush, QCursor, QIcon, QPalette, QPixmap)
-from PyQt5.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton,
-                             QVBoxLayout, QListWidgetItem, QMenu)
+from PyQt5.QtCore import (QSize, Qt)
+from PyQt5.QtGui import (QCursor, QIcon, QPixmap)
+from PyQt5.QtWidgets import (QFrame, QListWidgetItem, QMenu)
 
 from epookman_gui.api.db import DB_PATH, commit_ebook, connect
-from epookman_gui.api.ebook import (STATUS_HAVE_READ, STATUS_HAVE_NOT_READ,
+from epookman_gui.api.ebook import (STATUS_HAVE_NOT_READ, STATUS_HAVE_READ,
                                     STATUS_READING)
 from epookman_gui.api.thumbnailer import thumbnailer
 
@@ -31,76 +30,6 @@ THUMBNAILS_DIR = path.join(getenv("HOME"), ".cache", "epookman-gui",
                            "thumbnails")
 
 
-class Button(QPushButton):
-
-    def __init__(self,
-                 name,
-                 state,
-                 iconPath,
-                 tootip,
-                 func,
-                 QParent,
-                 parent=None):
-        super().__init__(QParent)
-
-        self.setSize()
-        self.setObjectName(name)
-        self.iconFormat = ".xpm"
-        self.state = state
-        self.name = name
-
-        self.iconPath = path.join(iconPath, name) + self.iconFormat
-        self.iconDisabledPath = path.join(iconPath,
-                                          name) + "Disabled" + self.iconFormat
-
-        self.setIconByState()
-        self.setToolTip(tootip)
-
-        self.setMouseTracking(True)
-        self.setClickFunction(func)
-
-    def toggleState(self):
-        self.state = not self.state
-        self.setIconByState()
-
-    def disable(self):
-        self.state = False
-        self.setIconByState()
-
-    def enable(self):
-        self.state = True
-        self.setIconByState()
-
-    def setSize(self):
-
-        self.setMaximumSize(QSize(BUTTONS_ICON, BUTTONS_ICON))
-
-    def setIconByState(self):
-
-        if self.state:
-            icon = QIcon(self.iconPath)
-        else:
-            icon = QIcon(self.iconDisabledPath)
-        self.setIcon(icon)
-        self.setIconSize(QSize(BUTTONS_ICON // 2, BUTTONS_ICON // 2))
-
-    def setClickFunction(self, func, *args):
-        self.mousePressEvent = lambda event: func(self, *args, event)
-
-
-class ButtonsBar(QFrame):
-
-    def __init__(self, QParent, ebook, parent=None):
-        super().__init__(QParent)
-        self.setObjectName("ButtonsBar_%s" % ebook.name)
-        self.setFrameShape(QFrame.NoFrame)
-        self.setFrameShadow(QFrame.Raised)
-
-        self.layout = QHBoxLayout(self)
-        self.layout.setContentsMargins(30, 0, 30, 0)
-        self.layout.setSpacing(0)
-
-
 class EbookItem(QListWidgetItem):
 
     def __init__(self, QParent, ebook, parent=None):
@@ -110,7 +39,7 @@ class EbookItem(QListWidgetItem):
 
         self.setText(ebook.name)
         self.setTextAlignment(Qt.AlignHCenter | Qt.AlignBottom)
-        self.setToolTip(ebook.name)
+        self.setToolTip(ebook.metadata)
         self.setThumbnail()
         self.setSizeHint(QSize(EBOOKFRAME_WIDTH, EBOOKFRAME_HEIGHT))
 
@@ -133,3 +62,25 @@ class EbookItem(QListWidgetItem):
                          THUMBNAIL_HEIGHT * QUALITY_SCALE)
 
         self.setIcon(QIcon(img))
+
+    def markFav(self):
+        self.ebook.toggle_fav()
+        self.commit()
+
+    def markDone(self):
+        self.ebook.set_status(STATUS_HAVE_READ)
+        self.commit()
+
+    def markToRead(self):
+        self.ebook.set_status(STATUS_HAVE_NOT_READ)
+        self.commit()
+
+    def markReading(self):
+        self.ebook.set_status(STATUS_READING)
+        self.commit()
+
+    def commit(self):
+        conn = connect(DB_PATH)
+        commit_ebook(conn, self.ebook)
+        conn.commit()
+        conn.close()

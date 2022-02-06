@@ -1,0 +1,11 @@
+QMenu {
+  font: 16px;
+  color: rgb(255, 121, 198);
+  background-color: rgb(35, 37, 49);
+  border: 0px solid;
+  text-align: center; 
+}
+
+QMenu::item:selected {
+  background-color: rgb(68, 71, 90);
+}

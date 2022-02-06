@@ -5,8 +5,7 @@
 
 from PyQt5.QtCore import (QSize, Qt, QRect, QEasingCurve, QPropertyAnimation)
 from PyQt5.QtGui import (QCursor, QIcon, QPixmap)
-from PyQt5.QtWidgets import (QFrame, QLabel, QPushButton, QVBoxLayout, QWidget)
-from time import sleep
+from PyQt5.QtWidgets import (QFrame, QPushButton, QVBoxLayout, QWidget)
 
 LEFTMENU_WIDTH = 120
 LEFTMENU_HEIGHT = 16777215
@@ -126,10 +125,10 @@ class LeftMenu(QFrame):
     def setLayoutes(self):
         self.topMenusLayout.addWidget(self.toggle)
         self.topMenusLayout.addWidget(self.all)
-        self.topMenusLayout.addWidget(self.fav)
         self.topMenusLayout.addWidget(self.folders)
         self.topMenusLayout.addWidget(self.reading)
         self.topMenusLayout.addWidget(self.toread)
+        self.topMenusLayout.addWidget(self.fav)
         self.topMenusLayout.addWidget(self.done)
         self.topMenusLayout.addWidget(self.settings)
 

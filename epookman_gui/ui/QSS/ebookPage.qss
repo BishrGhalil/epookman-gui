@@ -49,3 +49,8 @@ QToolTip {
   margin: 5px;
   text-align: center; 
 }
+
+QListWidget {
+  selection-color:  rgb(59, 62, 80);
+  selection-background-color:  rgb(189, 147, 249);
+}
