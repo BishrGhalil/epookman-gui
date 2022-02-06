@@ -5,9 +5,10 @@
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtWidgets import (QFrame, QLabel, QListView, QListWidget,
                              QListWidgetItem)
+from timeIt import timeIt
 
-from epookman_gui.ui.widgets.ebook import (EbookItem, THUMBNAIL_WIDTH,
-                                       THUMBNAIL_HEIGHT)
+from epookman_gui.ui.widgets.ebook import (THUMBNAIL_HEIGHT, THUMBNAIL_WIDTH,
+                                           EbookItem)
 
 ITEMS_SPACING = 25
 
@@ -21,6 +22,7 @@ class ListWidget(QListWidget):
         self.setAutoFillBackground(True)
         self.setViewMode(QListView.IconMode)
         self.items = {}
+        self.itemsSet = set()
         self.set(ebookList)
         self.setResizeMode(QListWidget.Adjust)
         self.setSpacing(ITEMS_SPACING)
@@ -29,20 +31,49 @@ class ListWidget(QListWidget):
         with open("epookman_gui/ui/QSS/listWidget.qss", "r") as f:
             self.setStyleSheet(f.read())
 
+    def checkEbookItem(self, ebook):
+        if self.items.get(ebook.name):
+            return True
+        else:
+            return False
+
+    def createAddItem(self, ebook):
+        item = EbookItem(self, ebook)
+        self.addItem(item)
+        self.items[ebook.name] = item
+        self.itemsSet.add(ebook.name)
+
+    def getItemByName(self, ebookName):
+        item = self.items[ebookName]
+        return item
+
+    def removeItem(self, item):
+        row = self.row(item)
+        self.takeItem(row)
+
     def set(self, ebookList):
         self.items = dict()
         for ebook in ebookList:
-            i = EbookItem(self, ebook)
-            self.addItem(i)
-            self.items[ebook.name] = i
+            self.createAddItem(ebook)
 
     def delete(self):
         self.items = {}
         self.clear()
 
     def update(self, ebookList):
-        self.delete()
-        self.set(ebookList)
+        ebooks = {ebook.name: ebook for ebook in ebookList}
+        newEbooksSet = set(ebooks.keys())
+        toRemove = self.itemsSet.difference(newEbooksSet)
+        toCreate = newEbooksSet.difference(self.itemsSet)
+        for ebookName in toRemove:
+            item = self.getItemByName(ebookName)
+            self.removeItem(item)
+
+        for ebookName in toCreate:
+            ebook = ebooks[ebookName]
+            self.createAddItem(ebook)
+
+        self.itemsSet = newEbooksSet
 
     def search(self, text):
         for title in self.items.keys():
