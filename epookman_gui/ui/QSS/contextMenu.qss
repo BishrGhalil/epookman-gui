@@ -1,5 +1,5 @@
 QMenu {
-  font: 16px;
+  font: 18px;
   color: rgb(255, 121, 198);
   background-color: rgb(35, 37, 49);
   border: 0px solid;

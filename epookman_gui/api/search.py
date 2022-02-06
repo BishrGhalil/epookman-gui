@@ -8,6 +8,7 @@ from epookman_gui.api.ebook import Ebook
 from epookman_gui.api.mime import Mime
 from epookman_gui.api.dirent import Dirent
 
+
 def scane(dirs):
     ebooks = []
     mime = Mime()
@@ -45,7 +46,7 @@ def scaneOneByOne(dirPath):
     Dir.getfiles()
     total = len(Dir.files)
     for i, file in enumerate(Dir.files):
-        percent = int(((i - 1) / (total - 1)) * 100)
+        percent = int(((i) / (total)) * 100)
         mime_type = mime.mime_type(file)
         if mime_type != None:
             if mime.is_ebook(mime_type) and not ebook_files.get(file):
@@ -53,7 +54,7 @@ def scaneOneByOne(dirPath):
                 ebook.set_path(file)
                 ebook.set_type(mime_type)
                 ebook.set_parent_folder(dirPath)
-                ebook.metadata = ebook.get_meta_data_string()
+                ebook.set_metadata(ebook.get_meta_data_string())
                 yield percent, ebook
 
         else:
