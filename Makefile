@@ -12,6 +12,7 @@ run:
 clean:
 	find epookman -depth -name __pycache__ -type d -exec rm -r -- {} \;
 	find -depth -name "*.log" -type f -exec rm -rf -- {} \;
+	find -depth -name "*.pyc" -type f -exec rm -rf -- {} \;
 	rm -rf dist build epookman.egg-info
 
 .PHONE: clean run

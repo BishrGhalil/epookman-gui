@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton,
 
 from epookman_gui.api.db import DB_PATH, commit_ebook, connect
 from epookman_gui.api.ebook import (STATUS_HAVE_READ, STATUS_HAVE_NOT_READ,
-                                STATUS_READING)
+                                    STATUS_READING)
 from epookman_gui.api.thumbnailer import thumbnailer
 
 FRAME_SCALE = 2
@@ -86,6 +86,19 @@ class Button(QPushButton):
 
     def setClickFunction(self, func, *args):
         self.mousePressEvent = lambda event: func(self, *args, event)
+
+
+class ButtonsBar(QFrame):
+
+    def __init__(self, QParent, ebook, parent=None):
+        super().__init__(QParent)
+        self.setObjectName("ButtonsBar_%s" % ebook.name)
+        self.setFrameShape(QFrame.NoFrame)
+        self.setFrameShadow(QFrame.Raised)
+
+        self.layout = QHBoxLayout(self)
+        self.layout.setContentsMargins(30, 0, 30, 0)
+        self.layout.setSpacing(0)
 
 
 class EbookItem(QListWidgetItem):
