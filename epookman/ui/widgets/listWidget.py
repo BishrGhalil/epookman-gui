@@ -6,9 +6,12 @@ from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtWidgets import (QFrame, QLabel, QListView, QListWidget,
                              QListWidgetItem)
 
-from epookman.ui.widgets.ebook import EbookFrame, EbookListWidgetItem
+from epookman.ui.widgets.ebook import (EbookItem, THUMBNAIL_WIDTH,
+                                       THUMBNAIL_HEIGHT)
+from timeIt import timeIt
 
 ITEMS_SPACING = 25
+
 
 class ListWidget(QListWidget):
 
@@ -22,17 +25,17 @@ class ListWidget(QListWidget):
         self.set(ebookList)
         self.setResizeMode(QListWidget.Adjust)
         self.setSpacing(ITEMS_SPACING)
+        self.setIconSize(QSize(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT))
 
         with open("epookman/ui/QSS/listWidget.qss", "r") as f:
             self.setStyleSheet(f.read())
 
+    @timeIt("Setting the list")
     def set(self, ebookList):
-        self.widgets = dict()
+        self.items = dict()
         for ebook in ebookList:
-            w = EbookFrame(self, ebook)
-            i = EbookListWidgetItem(self, ebook)
+            i = EbookItem(self, ebook)
             self.addItem(i)
-            self.setItemWidget(i, w)
             self.items[ebook.name] = i
 
     def delete(self):

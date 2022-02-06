@@ -12,24 +12,24 @@ from PyQt5.QtWidgets import (QFrame, QHBoxLayout, QLabel, QPushButton,
                              QVBoxLayout, QListWidgetItem, QMenu)
 
 from epookman.api.db import DB_PATH, commit_ebook, connect
-from epookman.api.ebook import (STATUS_HAVE_READ, STATUS_HAVE_NOT_READ, STATUS_READING)
+from epookman.api.ebook import (STATUS_HAVE_READ, STATUS_HAVE_NOT_READ,
+                                STATUS_READING)
 from epookman.api.thumbnailer import thumbnailer
 
-SCALE = 2
-EBOOKFRAME_THUMBNAIL_WIDTH = 99 * SCALE
-EBOOKFRAME_THUMBNAIL_HEIGHT = 128 * SCALE
+FRAME_SCALE = 2
+QUALITY_SCALE = 3
 
-EBOOKFRAME_WIDTH = EBOOKFRAME_THUMBNAIL_WIDTH
-EBOOKFRAME_HEIGHT = EBOOKFRAME_THUMBNAIL_HEIGHT
+FONT_HEIGHT = 30
 
-EBOOKFRAME_BUTTONS_ICON = 40
-EBOOKFRAME_BUTTONS_HEIGHT = EBOOKFRAME_BUTTONS_ICON
-EBOOKFRAME_BUTTONS_WIDTH = EBOOKFRAME_WIDTH
+THUMBNAIL_WIDTH = 99 * FRAME_SCALE
+THUMBNAIL_HEIGHT = 128 * FRAME_SCALE
 
-EBOOKFRAME_WIDTH_MIN = EBOOKFRAME_THUMBNAIL_WIDTH
-EBOOKFRAME_HEIGHT_MIN = EBOOKFRAME_THUMBNAIL_HEIGHT + EBOOKFRAME_BUTTONS_HEIGHT
+EBOOKFRAME_WIDTH = THUMBNAIL_WIDTH
+EBOOKFRAME_HEIGHT = THUMBNAIL_HEIGHT + FONT_HEIGHT
+
 THUMBNAILS_DIR = path.join(getenv("HOME"), ".cache", "epookman-gui",
                            "thumbnails")
+
 
 class Button(QPushButton):
 
@@ -73,8 +73,7 @@ class Button(QPushButton):
 
     def setSize(self):
 
-        self.setMaximumSize(
-            QSize(EBOOKFRAME_BUTTONS_ICON, EBOOKFRAME_BUTTONS_ICON))
+        self.setMaximumSize(QSize(BUTTONS_ICON, BUTTONS_ICON))
 
     def setIconByState(self):
 
@@ -83,14 +82,13 @@ class Button(QPushButton):
         else:
             icon = QIcon(self.iconDisabledPath)
         self.setIcon(icon)
-        self.setIconSize(
-            QSize(EBOOKFRAME_BUTTONS_ICON // 2, EBOOKFRAME_BUTTONS_ICON // 2))
+        self.setIconSize(QSize(BUTTONS_ICON // 2, BUTTONS_ICON // 2))
 
     def setClickFunction(self, func, *args):
         self.mousePressEvent = lambda event: func(self, *args, event)
 
 
-class EbookListWidgetItem(QListWidgetItem):
+class EbookItem(QListWidgetItem):
 
     def __init__(self, QParent, ebook, parent=None):
         super().__init__(QParent)
@@ -100,7 +98,8 @@ class EbookListWidgetItem(QListWidgetItem):
         self.setText(ebook.name)
         self.setTextAlignment(Qt.AlignHCenter | Qt.AlignBottom)
         self.setToolTip(ebook.name)
-        self.setSizeHint(QSize(EBOOKFRAME_WIDTH, EBOOKFRAME_HEIGHT + 70))
+        self.setThumbnail()
+        self.setSizeHint(QSize(EBOOKFRAME_WIDTH, EBOOKFRAME_HEIGHT))
 
     def hide(self):
         self.setHidden(True)
@@ -108,173 +107,16 @@ class EbookListWidgetItem(QListWidgetItem):
     def show(self):
         self.setHidden(False)
 
-
-class EbookFrame(QFrame):
-
-    def __init__(self, QParent, ebook, parent=None):
-        super().__init__(QParent)
-        self.parent = parent
-
-        self.ebook = ebook
-        self.setMinimumSize(QSize(EBOOKFRAME_WIDTH_MIN, EBOOKFRAME_HEIGHT_MIN))
-        self.setMaximumSize(QSize(EBOOKFRAME_WIDTH, EBOOKFRAME_HEIGHT))
-        self.setFrameShape(QFrame.NoFrame)
-        self.setFrameShadow(QFrame.Raised)
-        self.setObjectName("ebook_%s" % self.ebook.name)
-
-        self.layout = QVBoxLayout(self)
-        self.layout.setContentsMargins(0, 0, 0, 0)
-        self.layout.setSpacing(0)
-        self.layout.setObjectName("ebook_layout_%s" % self.ebook.name)
-
-        self.setThumbnail()
-        self.setButtons()
-        self.setLayoutes()
-
-        self.installEventFilter(self)
-        self.mousePressEvent = lambda event: self.openEbook(event, ebook)
-        self.name = ebook.name
-
-    def existsThumbnail(self):
-        if not path.lexists(self.thumbnail_file):
-            return False
-
-        else:
-            return True
-
     def setThumbnail(self):
 
         self.thumbnail_file = path.join(THUMBNAILS_DIR,
                                         self.ebook.name + ".png")
-        self.thumbnail = QFrame(self)
 
-        self.thumbnail.setMaximumSize(
-            QSize(EBOOKFRAME_THUMBNAIL_WIDTH, EBOOKFRAME_THUMBNAIL_HEIGHT))
-        self.thumbnail.setToolTip(self.ebook.metadata)
-        self.thumbnail.setFrameShape(QFrame.NoFrame)
-        self.thumbnail.setFrameShadow(QFrame.Raised)
-        self.thumbnail.setObjectName("ebook_thumbnail_%s" % self.ebook.name)
-
-        if self.existsThumbnail():
-            img = QPixmap(self.thumbnail_file)
-        else:
+        img = QPixmap(self.thumbnail_file)
+        if img.isNull():
             img = QPixmap("epookman/ui/resources/document.png")
 
-        label = QLabel(self.thumbnail)
-        img = img.scaled(EBOOKFRAME_THUMBNAIL_WIDTH,
-                         EBOOKFRAME_THUMBNAIL_HEIGHT)
-        label.setPixmap(img)
+        img = img.scaled(THUMBNAIL_WIDTH * QUALITY_SCALE,
+                         THUMBNAIL_HEIGHT * QUALITY_SCALE)
 
-    def setButtons(self):
-        # == Making buttons frame ==
-        self.buttons = QFrame(self)
-        self.buttons.setMaximumSize(
-            QSize(EBOOKFRAME_BUTTONS_WIDTH, EBOOKFRAME_BUTTONS_HEIGHT))
-        self.buttons.setFrameShape(QFrame.NoFrame)
-        self.buttons.setFrameShadow(QFrame.Raised)
-        self.buttons.setObjectName("ebook_buttons_%s" % self.ebook.name)
-        self.buttons.setContentsMargins(0, 0, 0, 0)
-        self.buttonsLayout = QHBoxLayout(self.buttons)
-        self.buttonsLayout.setObjectName("ebook_buttons_layout_%s" %
-                                         self.ebook.name)
-
-        # == Making buttons ==
-        # To_Read button
-        buttonState = False
-        if self.ebook.status == STATUS_HAVE_NOT_READ:
-            buttonState = True
-        self.toread = Button("toread", buttonState, "epookman/ui/resources",
-                             "Mark as To Read", self.markToread, self.buttons)
-
-        # Fav button
-        buttonState = False
-        if self.ebook.fav:
-            buttonState = True
-        self.fav = Button("fav", buttonState, "epookman/ui/resources",
-                          "Add to Fav", self.markFav, self.buttons)
-
-        # Done button
-        buttonState = False
-        if self.ebook.status == STATUS_HAVE_READ:
-            buttonState = True
-        self.done = Button("done", buttonState, "epookman/ui/resources",
-                           "Mark as Done", self.markDone, self.buttons)
-
-    def setLayoutes(self):
-
-        self.buttonsLayout.addWidget(self.toread)
-        self.buttonsLayout.addWidget(self.fav)
-        self.buttonsLayout.addWidget(self.done)
-
-        self.layout.addWidget(self.buttons)
-        self.layout.addWidget(self.thumbnail)
-
-        self.setCursor(QCursor(Qt.PointingHandCursor))
-
-    def markToread(self, button, event):
-        if self.ebook.status == STATUS_HAVE_READ:
-            self.toggleIcon(self.done, False)
-
-        self.toggleIcon(button, True)
-        self.ebook.set_status(STATUS_HAVE_NOT_READ)
-        self.commit()
-
-        self.updateFrame(event)
-
-    def markFav(self, button, event):
-        state = True if not button.state else False
-        self.toggleIcon(button, state)
-        self.ebook.toggle_fav()
-        self.commit()
-
-        self.updateFrame(event)
-
-    def markDone(self, button, event):
-        if self.ebook.status == STATUS_HAVE_NOT_READ:
-            self.toggleIcon(self.toread, False)
-
-        self.toggleIcon(button, True)
-        self.ebook.set_status(STATUS_HAVE_READ)
-        self.commit()
-
-        self.updateFrame(event)
-
-    def markReading(self):
-        self.ebook.set_status(STATUS_READING)
-        self.commit()
-
-    def toggleIcon(self, button, status):
-        if status:
-            button.enable()
-        else:
-            button.disable()
-
-    def updateInfo(self):
-        self.thumbnail.setToolTip(self.ebook.metadata)
-
-    def updateFrame(self, event):
-        self.updateInfo()
-        super().eventFilter(self, event)
-
-    def commit(self):
-        conn = connect(DB_PATH)
-        commit_ebook(conn, self.ebook)
-        conn.commit()
-        conn.close()
-
-    def hide(self):
-        for w in [self, self.buttons, self.thumbnail]:
-            w.setVisible(False)
-
-    def show(self):
-        for w in [self, self.buttons, self.thumbnail]:
-            w.setVisible(True)
-
-    def openEbook(self, event, ebook):
-
-        if event.button() == Qt.LeftButton:
-            ereader = "zathura"
-            file = open("/dev/null", "w")
-            subprocess.Popen([ereader, ebook.get_path()], stderr=file)
-            file.close()
-            self.markReading()
+        self.setIcon(QIcon(img))
