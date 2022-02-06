@@ -159,6 +159,7 @@ class Content(QFrame):
         self.dpbar.setFormat("%v/%m")
         self.vpbar.resetFormat()
         self.scane.setEnabled(False)
+        self.addDir.setEnabled(False)
         self.thread = scaneThread(dirs)
         self.thread._currentValueSignal.connect(self.updateVProgressBar)
         self.thread._currentDirSignal.connect(self.updateDProgressBar)
@@ -231,6 +232,7 @@ class Content(QFrame):
         if self.dpbar.value() >= 99:
             self.dpbar.setValue(0)
             self.scane.setEnabled(True)
+            self.addDir.setEnabled(True)
             self.dpbar.setFormat("")
 
 

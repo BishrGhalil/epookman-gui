@@ -13,7 +13,9 @@ def thumbnailer(file, output):
     if ".pdf" not in file:
         return -1
     if path.lexists(file):
+        errFile = open("/dev/null", "w")
         return subprocess.run(
-            ["pdftocairo", "-singlefile", file, "-png", output])
+            ["pdftocairo", "-singlefile", file, "-png", output],
+            stderr=errFile)
     else:
         print("File %s does not exists" % file)
