@@ -8,6 +8,7 @@
 import re
 
 import magic
+from timeIt import timeIt
 
 MIME_TYPE_EBOOK_PDF = 0
 MIME_TYPE_EBOOK_EPUB = 1
@@ -15,6 +16,7 @@ MIME_TYPE_EBOOK_MOBI = 2
 MIME_TYPE_EBOOK_XPS = 3
 MIME_TYPE_EBOOK_CBR = 4
 MIME_TYPE_EBOOK_CBZ = 5
+
 
 class Mime():
 
@@ -40,11 +42,10 @@ class Mime():
     def is_ebook(self, mime_type):
         if MIME_TYPE_EBOOK_PDF <= mime_type <= MIME_TYPE_EBOOK_CBZ:
             return True
-        
+
         else:
             return False
 
-    
     def is_ebook_from_path(self, file):
         for ebook_type in self.re_ebooks_types.keys():
             if re.search(ebook_type, file):

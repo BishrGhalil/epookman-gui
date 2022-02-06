@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (QFileDialog, QFrame, QHBoxLayout, QLabel,
                              QPushButton, QScrollArea, QVBoxLayout, QWidget)
 
 from epookman_gui.api.db import (DB_PATH, commit_dir, commit_ebook, connect,
-                             del_dir, del_ebooks, fetch_dirs)
+                                 del_dir, del_ebooks, fetch_dirs)
 from epookman_gui.api.dirent import Dirent
 from epookman_gui.api.search import scaneOneByOne
 

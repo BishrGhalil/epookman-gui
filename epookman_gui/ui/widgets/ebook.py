@@ -6,13 +6,13 @@
 import subprocess
 from os import getenv, path
 
-from PyQt5.QtCore import (QSize, Qt)
-from PyQt5.QtGui import (QCursor, QIcon, QPixmap)
-from PyQt5.QtWidgets import (QFrame, QListWidgetItem, QMenu)
+from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtGui import QCursor, QIcon, QPixmap
+from PyQt5.QtWidgets import QFrame, QListWidgetItem, QMenu
 
 from epookman_gui.api.db import DB_PATH, commit_ebook, connect
 from epookman_gui.api.ebook import (STATUS_HAVE_NOT_READ, STATUS_HAVE_READ,
-                                    STATUS_READING)
+                                    STATUS_READING, EBOOK_TYPE_PDF)
 from epookman_gui.api.thumbnailer import thumbnailer
 
 FRAME_SCALE = 2
@@ -49,12 +49,21 @@ class EbookItem(QListWidgetItem):
     def show(self):
         self.setHidden(False)
 
+    def createThumbnail(self):
+        outputPath = path.join(THUMBNAILS_DIR, self.ebook.name)
+        thumbnailer(self.ebook.path, outputPath)
+
     def setThumbnail(self):
 
         self.thumbnail_file = path.join(THUMBNAILS_DIR,
                                         self.ebook.name + ".png")
 
         img = QPixmap(self.thumbnail_file)
+
+        if img.isNull() and self.ebook.type == EBOOK_TYPE_PDF:
+            self.createThumbnail()
+            img = QPixmap(self.thumbnail_file)
+
         if img.isNull():
             img = QPixmap("epookman_gui/ui/resources/document.png")
 

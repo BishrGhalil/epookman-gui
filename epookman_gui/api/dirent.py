@@ -7,6 +7,7 @@
 
 import os
 from sys import stderr
+from timeIt import timeIt
 
 
 def check_path(path):
@@ -14,6 +15,7 @@ def check_path(path):
         return False
 
     return True
+
 
 class Dirent():
 

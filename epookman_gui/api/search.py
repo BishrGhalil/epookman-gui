@@ -7,11 +7,6 @@ from epookman_gui.api.db import (DB_PATH, commit_ebooks, connect, fetch_ebooks)
 from epookman_gui.api.ebook import Ebook
 from epookman_gui.api.mime import Mime
 from epookman_gui.api.dirent import Dirent
-from epookman_gui.api.thumbnailer import thumbnailer
-
-THUMBNAILS_DIR = path.join(getenv("HOME"), ".cache", "epookman-gui",
-                           "thumbnails")
-
 
 def scane(dirs):
     ebooks = []
@@ -59,7 +54,6 @@ def scaneOneByOne(dirPath):
                 ebook.set_type(mime_type)
                 ebook.set_parent_folder(dirPath)
                 ebook.metadata = ebook.get_meta_data_string()
-                thumbnailer(ebook.path, path.join(THUMBNAILS_DIR, ebook.name))
                 yield percent, ebook
 
         else:
