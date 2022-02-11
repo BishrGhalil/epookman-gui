@@ -6,7 +6,7 @@
 # TODO: Maybe change to QListView
 import subprocess
 
-from PyQt5.QtCore import (QEvent, QSize, Qt)
+from PyQt5.QtCore import QEvent, QSize, Qt
 from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import (QAction, QFrame, QListView, QListWidget,
                              QListWidgetItem, QMenu)
@@ -35,40 +35,49 @@ class ListWidget(QListWidget):
         self.installEventFilter(self)
         self.itemDoubleClicked.connect(self.openEbook)
 
-        with open("epookman_gui/ui/QSS/listWidget.qss", "r") as f:
-            self.setStyleSheet(f.read())
+        self.setContextMenu()
+
+    def setContextMenu(self):
+        self.menu = QMenu()
+
+        self.menu.setObjectName("contextMenu")
+        self.open = QAction("Open")
+        self.addFav = QAction("Add to Fav")
+        self.markAsToRead = QAction("Mark as To Read")
+        self.markAsDone = QAction("Mark as Done")
+        self.delFav = QAction("Remove from Fav")
+
+        self.menu.addAction(self.open)
+        self.menu.addAction(self.addFav)
+        self.menu.addAction(self.markAsToRead)
+        self.menu.addAction(self.markAsDone)
+        self.menu.addAction(self.delFav)
+
+        self.menu.setCursor(QCursor(Qt.PointingHandCursor))
 
     def eventFilter(self, source, event):
         if event.type() == QEvent.ContextMenu and source is self:
-            menu = QMenu()
-            with open("epookman_gui/ui/QSS/contextMenu.qss", "r") as f:
-                menu.setStyleSheet(f.read())
 
-            menu.setCursor(QCursor(Qt.PointingHandCursor))
-            toggleFav = QAction("Toggle Fav")
-            markAsToRead = QAction("Mark as: To Read")
-            markAsDone = QAction("Mark as: Done")
-
-            menu.addAction(toggleFav)
-            menu.addAction(markAsToRead)
-            menu.addAction(markAsDone)
-
-            menu_click = menu.exec_(event.globalPos())
+            menu_click = self.menu.exec_(event.globalPos())
             item = source.itemAt(event.pos())
+
             if not item:
                 return False
 
-            if menu_click == toggleFav:
-                item.markFav()
-                return True
+            if menu_click == self.open:
+                self.openEbook(item)
 
-            elif menu_click == markAsDone:
+            if menu_click == self.addFav:
+                item.markFav(True)
+
+            elif menu_click == self.delFav:
+                item.markFav(False)
+
+            elif menu_click == self.markAsDone:
                 item.markDone()
-                return True
 
-            elif menu_click == markAsToRead:
+            elif menu_click == self.markAsToRead:
                 item.markToRead()
-                return True
 
         return super(ListWidget, self).eventFilter(source, event)
 

@@ -46,9 +46,9 @@ class Content(QFrame):
         super().__init__(QParent)
         self.setFrameShape(QFrame.NoFrame)
         self.setFrameShadow(QFrame.Raised)
-        self.setObjectName("settings_content")
+        self.setObjectName("settingsContent")
         self.layout = QVBoxLayout(self)
-        self.layout.setObjectName("settings_content_layout")
+        self.layout.setObjectName("settingsContentLayout")
         self.layout.setContentsMargins(30, 0, 30, 0)
 
         self.dirs = {}
@@ -66,14 +66,14 @@ class Content(QFrame):
         self.scrollArea = QScrollArea(self)
         self.scrollArea.setFrameShape(QFrame.NoFrame)
         self.scrollArea.setWidgetResizable(True)
-        self.scrollArea.setObjectName("settings_scrollarea")
+        self.scrollArea.setObjectName("settingsScrollarea")
 
         self.scrollAreaContent = QWidget()
-        self.scrollAreaContent.setObjectName("settings_scrollarea_content")
+        self.scrollAreaContent.setObjectName("settingsScrollareaContent")
         self.scrollAreaLayout = QHBoxLayout(self.scrollAreaContent)
         self.scrollAreaLayout.setContentsMargins(0, 0, 0, 0)
         self.scrollAreaLayout.setObjectName(
-            "settings_content_scrollarea_layout")
+            "settingsContentScrollareaLayout")
 
     def setLayoutes(self):
         self.scaneFrameLayout.addWidget(self.scane)
@@ -111,19 +111,19 @@ class Content(QFrame):
         self.buttonsLayout = QVBoxLayout(self.buttons)
         self.buttonsLayout.setContentsMargins(0, 0, 0, 0)
         self.buttonsLayout.setSpacing(5)
-        self.buttonsLayout.setObjectName("settings_content_buttons_layout")
+        self.buttonsLayout.setObjectName("settingsContentButtonsLayout")
         self.buttonsLayout.setAlignment(Qt.AlignTop)
 
         self.scane = QPushButton(self.buttons)
         self.scane.setMinimumSize(QSize(16777215, 50))
-        self.scane.setObjectName("scane")
+        self.scane.setObjectName("scaneButton")
         self.scane.setText("RESCANE")
         self.scane.setCursor(QCursor(Qt.PointingHandCursor))
         self.scane.clicked.connect(self.scaneUpdateProgressBar)
 
         self.addDir = QPushButton(self.buttons)
         self.addDir.setMinimumSize(QSize(16777215, 50))
-        self.addDir.setObjectName("addDir")
+        self.addDir.setObjectName("addDirButton")
         self.addDir.setText("ADD DIR")
         self.addDir.setCursor(QCursor(Qt.PointingHandCursor))
         self.addDir.clicked.connect(self.addDirScane)
@@ -131,11 +131,11 @@ class Content(QFrame):
     def setProgressBars(self):
         self.vpbar = QProgressBar(self.buttons)
         self.vpbar.setMinimumSize(QSize(100, 10))
-        self.vpbar.setObjectName("values_progressbar")
+        self.vpbar.setObjectName("valuesProgressbar")
 
         self.dpbar = QProgressBar(self.buttons)
         self.dpbar.setMinimumSize(QSize(100, 10))
-        self.dpbar.setObjectName("dirs_progressbar")
+        self.dpbar.setObjectName("dirsProgressbar")
         self.dpbar.setFormat("%v/%m")
 
     def setList(self):
@@ -146,6 +146,7 @@ class Content(QFrame):
         self.list.setCursor(QCursor(Qt.PointingHandCursor))
         self.list.setSpacing(2)
         self.list.setMaximumSize(QSize(1300, 400))
+        self.list.setObjectName("dirsList")
 
         self.setListItems()
 
@@ -246,9 +247,6 @@ class SettingsPage(QWidget):
         self.layout.setSpacing(0)
         self.layout.setObjectName("settings_layout")
 
-        with open("epookman_gui/ui/QSS/settingsPage.qss", "r") as f:
-            self.setStyleSheet(f.read())
-
         self.setTopbar()
         content = Content(self)
         self.setContent(content)
@@ -268,7 +266,7 @@ class SettingsPage(QWidget):
 
     def setLabels(self):
         self.label = QLabel(self.topbar)
-        self.label.setObjectName("title")
+        self.label.setObjectName("settingsPageTitle")
         self.label.setText("SETTINGS")
 
     def setContent(self, content):

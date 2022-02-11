@@ -12,9 +12,9 @@ class Content(QFrame):
         super().__init__(QParent)
         self.setFrameShape(QFrame.NoFrame)
         self.setFrameShadow(QFrame.Raised)
-        self.setObjectName("folders_content")
+        self.setObjectName("foldersContent")
         self.layout = QVBoxLayout(self)
-        self.layout.setObjectName("folders_content_layout")
+        self.layout.setObjectName("foldersContentLayout")
         self.layout.setContentsMargins(30, 0, 30, 0)
 
     def setScrollArea(self):
@@ -30,7 +30,7 @@ class Content(QFrame):
         self.scrollareaLayout.setContentsMargins(0, 0, 0, 0)
         self.scrollareaLayout.setSpacing(0)
         self.scrollareaLayout.setObjectName(
-            "folders_content_scrollarea_layout")
+            "foldersContentScrollareaLayout")
         self.scrollArea.setWidget(self.scrollarea)
 
     def setLayoutes(self):
@@ -44,13 +44,11 @@ class FoldersPage(QWidget):
 
     def __init__(self, QParent, parent=None):
         super().__init__(QParent)
-        self.setObjectName("pageFolders")
+        self.setObjectName("foldersPage")
         self.layout = QVBoxLayout(self)
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.layout.setSpacing(0)
-        self.layout.setObjectName("folders_layout")
-        with open("epookman_gui/ui/QSS/foldersPage.qss", "r") as f:
-            self.setStyleSheet(f.read())
+        self.layout.setObjectName("foldersLayout")
 
         self.setTopbar()
         content = Content(self)
@@ -63,15 +61,15 @@ class FoldersPage(QWidget):
         self.topbar.setMaximumSize(QSize(16777215, 130))
         self.topbar.setFrameShape(QFrame.NoFrame)
         self.topbar.setFrameShadow(QFrame.Raised)
-        self.topbar.setObjectName("settingsPage_topbar")
+        self.topbar.setObjectName("foldersPageTopbar")
         self.topbarLayout = QHBoxLayout(self.topbar)
         self.topbarLayout.setContentsMargins(30, 40, 60, 10)
         self.topbarLayout.setSpacing(0)
-        self.topbarLayout.setObjectName("settingsPage_topbar_layout")
+        self.topbarLayout.setObjectName("foldersPageTopbarLayout")
 
     def setLabels(self):
         self.label = QLabel(self.topbar)
-        self.label.setObjectName("label")
+        self.label.setObjectName("foldersPageTitle")
         self.label.setText("FOLDERS")
 
     def setContent(self, content):

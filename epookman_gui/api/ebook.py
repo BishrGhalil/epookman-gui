@@ -123,11 +123,8 @@ class Ebook():
     def get_data(self):
         data = {
             "name": self.name,
-            "folder": self.folder,
             "type": self.get_type_string(),
             "category": self.category,
-            "fav": self.get_fav_string(),
-            "status": self.get_status_string(self.status),
         }
 
         return data
@@ -143,19 +140,15 @@ class Ebook():
             if self.type == self.ebook_types.get("pdf"):
                 with open(path, "rb") as file:
                     pdfreader = PdfFileReader(file)
-                    data["Encrypt"] = pdfreader.isEncrypted
                     if not data.get("Encrypt"):
                         data["Pages"] = pdfreader.numPages
                         info = pdfreader.documentInfo
-                        data["Creation"] = info.get('/CreationDate')
-                        data["Modification"] = info.get('/ModDate')
                         data["Creators"] = info.get('/Creator')
 
             elif self.type == self.ebook_types.get("epub"):
                 tmp_data = epub_meta.get_epub_metadata(path,
                                                        read_cover_image=False,
                                                        read_toc=False)
-                data["Creators"] = tmp_data.authors
                 data["Creation"] = tmp_data.publication_date
         except Exception as e:
             data = dict()
@@ -167,8 +160,15 @@ class Ebook():
         metadata = self.get_meta_data()
         data.update(metadata)
         string = ""
+        keys = data.keys()
+        keys_len = len(keys)
 
-        for index, key in enumerate(data.keys()):
-            string += "%-20s\t%s\n" % (key, data.get(key))
+        for index, key in enumerate(keys):
+            string += "%-20s\t%s" % (key, data.get(key))
+            if index < keys_len - 1:
+                string += "\n"
 
         return string
+
+    def update_meta_data_string(self):
+        self.metadata = self.get_meta_data_string()

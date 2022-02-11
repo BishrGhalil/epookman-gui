@@ -3,7 +3,8 @@
 # This file is part of epookman_gui, the console ebook manager.
 # License: MIT, see the file "LICENCS" for details.
 from PyQt5.QtCore import (QCoreApplication, QSize)
-from PyQt5.QtWidgets import (QFrame, QHBoxLayout, QVBoxLayout, QWidget, QMessageBox)
+from PyQt5.QtWidgets import (QFrame, QHBoxLayout, QVBoxLayout, QWidget,
+                             QMessageBox)
 from epookman_gui.ui.widgets.leftMenu import LeftMenu
 from epookman_gui.ui.widgets.pages import Pages
 
@@ -18,6 +19,7 @@ DEFAULT_PAGE = "ALL"
 MESSAGEBOX_WIDTH = 200
 MESSAGEBOX_HEIGHT = 100
 
+
 class Ui_MainWindow(object):
 
     def setupUi(self, MainWindow):
@@ -28,7 +30,7 @@ class Ui_MainWindow(object):
         MainWindow.resize(MAINWINDOW_WIDTH, MAINWINDOW_HEIGHT)
         MainWindow.setMinimumSize(
             QSize(MAINWINDOW_WIDTH_MIN, MAINWINDOW_HEIGHT_MIN))
-        with open("epookman_gui/ui/QSS/mainWindow.qss", "r") as f:
+        with open("epookman_gui/ui/themes/dracula.qss", "r") as f:
             MainWindow.setStyleSheet(f.read())
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")

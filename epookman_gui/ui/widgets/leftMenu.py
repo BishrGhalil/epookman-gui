@@ -27,13 +27,10 @@ class LeftMenu(QFrame):
         self.parent = parent
         self.setMinimumSize(QSize(LEFTMENU_MINIMIZED_WIDTH, LEFTMENU_HEIGHT))
 
-        with open("epookman_gui/ui/QSS/leftMenu.qss", "r") as f:
-            self.setStyleSheet(f.read())
-
         self.layout = QVBoxLayout(self)
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.layout.setSpacing(0)
-        self.layout.setObjectName("leftmenu_layout")
+        self.layout.setObjectName("leftmenuLayout")
 
         self.setTopMenusFrame()
         self.setButtons()
@@ -45,7 +42,7 @@ class LeftMenu(QFrame):
         self.topMenus = QFrame(self)
         self.topMenus.setFrameShape(QFrame.NoFrame)
         self.topMenus.setFrameShadow(QFrame.Raised)
-        self.topMenus.setObjectName("leftmenu_topmenus")
+        self.topMenus.setObjectName("leftmenuTopmenus")
         self.topMenusLayout = QVBoxLayout(self.topMenus)
         self.topMenusLayout.setContentsMargins(0, 0, 0, 0)
         self.topMenusLayout.setSpacing(2)
@@ -55,7 +52,7 @@ class LeftMenu(QFrame):
         self.toggle = QPushButton(self.topMenus)
         self.toggle.setMinimumSize(
             QSize(LEFTMENU_BUTTON_WIDTH, LEFTMENU_BUTTON_HEIGHT))
-        self.toggle.setObjectName("leftmenu_button_toggle")
+        self.toggle.setObjectName("leftmenuButtonToggle")
         icon = QIcon("epookman_gui/ui/resources/toggle.png")
         self.toggle.setIcon(icon)
         self.toggle.setIconSize(
@@ -66,7 +63,7 @@ class LeftMenu(QFrame):
         self.reading = QPushButton(self.topMenus)
         self.reading.setMinimumSize(
             QSize(LEFTMENU_BUTTON_WIDTH, LEFTMENU_BUTTON_HEIGHT))
-        self.reading.setObjectName("leftmenu_button_reading")
+        self.reading.setObjectName("leftmenuButton")
         self.reading.setText("READING")
         self.reading.setCursor(QCursor(Qt.PointingHandCursor))
         self.reading.setToolTip("Currently Reading Books")
@@ -74,7 +71,7 @@ class LeftMenu(QFrame):
         self.toread = QPushButton(self.topMenus)
         self.toread.setMinimumSize(
             QSize(LEFTMENU_BUTTON_WIDTH, LEFTMENU_BUTTON_HEIGHT))
-        self.toread.setObjectName("leftmenu_button_toread")
+        self.toread.setObjectName("leftmenuButton")
         self.toread.setText("TO READ")
         self.toread.setCursor(QCursor(Qt.PointingHandCursor))
         self.toread.setToolTip("Books To Read")
@@ -82,7 +79,7 @@ class LeftMenu(QFrame):
         self.all = QPushButton(self.topMenus)
         self.all.setMinimumSize(
             QSize(LEFTMENU_BUTTON_WIDTH, LEFTMENU_BUTTON_HEIGHT))
-        self.all.setObjectName("leftmenu_button_all")
+        self.all.setObjectName("leftmenuButton")
         self.all.setText("ALL")
         self.all.setCursor(QCursor(Qt.PointingHandCursor))
         self.all.setToolTip("Books To Read")
@@ -90,7 +87,7 @@ class LeftMenu(QFrame):
         self.done = QPushButton(self.topMenus)
         self.done.setMinimumSize(
             QSize(LEFTMENU_BUTTON_WIDTH, LEFTMENU_BUTTON_HEIGHT))
-        self.done.setObjectName("leftmenu_button_done")
+        self.done.setObjectName("leftmenuButton")
         self.done.setText("DONE")
         self.done.setCursor(QCursor(Qt.PointingHandCursor))
         self.done.setToolTip("Done Reading Books")
@@ -98,7 +95,7 @@ class LeftMenu(QFrame):
         self.fav = QPushButton(self.topMenus)
         self.fav.setMinimumSize(
             QSize(LEFTMENU_BUTTON_WIDTH, LEFTMENU_BUTTON_HEIGHT))
-        self.fav.setObjectName("leftmenu_button_fav")
+        self.fav.setObjectName("leftmenuButton")
         self.fav.setText("FAV")
         self.fav.setCursor(QCursor(Qt.PointingHandCursor))
         self.fav.setToolTip("My Favorites Books")
@@ -106,7 +103,7 @@ class LeftMenu(QFrame):
         self.folders = QPushButton(self.topMenus)
         self.folders.setMinimumSize(
             QSize(LEFTMENU_BUTTON_WIDTH, LEFTMENU_BUTTON_HEIGHT))
-        self.folders.setObjectName("leftmenu_button_folders")
+        self.folders.setObjectName("leftmenuButton")
         self.folders.setText("FOLDERS")
         self.folders.setCursor(QCursor(Qt.PointingHandCursor))
         self.folders.setToolTip("Browse Books By Folders")
@@ -114,7 +111,7 @@ class LeftMenu(QFrame):
         self.settings = QPushButton(self.topMenus)
         self.settings.setMinimumSize(
             QSize(LEFTMENU_BUTTON_WIDTH, LEFTMENU_BUTTON_HEIGHT))
-        self.settings.setObjectName("leftmenu_button_settings")
+        self.settings.setObjectName("leftmenuButton")
         self.settings.setText("SETTINGS")
         self.settings.setCursor(QCursor(Qt.PointingHandCursor))
         self.settings.setToolTip("App settings")

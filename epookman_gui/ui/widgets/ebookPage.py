@@ -18,7 +18,7 @@ class EbookPageContent(QFrame):
 
     def __init__(self, QParent, name, parent=None):
         super().__init__(QParent)
-        self.setObjectName("ebookpage_content")
+        self.setObjectName("ebookpageContent")
         self.parent = parent
         self.name = name
 
@@ -28,7 +28,7 @@ class EbookPageContent(QFrame):
         self.layout = QHBoxLayout(self)
         self.layout.setContentsMargins(30, 0, 30, 0)
         self.layout.setSpacing(0)
-        self.layout.setObjectName("ebookpage_content_layout")
+        self.layout.setObjectName("ebookpageContentLayout")
 
         self.setEbookList()
         self.setListGrid()
@@ -61,7 +61,7 @@ class EbookPageContent(QFrame):
         self.scrollArea.setFrameShape(QFrame.NoFrame)
         self.scrollArea.setFrameShadow(QFrame.Raised)
         self.scrollArea.setWidgetResizable(True)
-        self.scrollArea.setObjectName("ebookpage_content_scrollArea")
+        self.scrollArea.setObjectName("ebookpageContentScrollArea")
 
         self.scrollAreaContent = QWidget()
         self.scrollAreaContent.setGeometry(QRect(0, 0, 830, 453))
@@ -91,15 +91,12 @@ class EbookPage(QWidget):
     def __init__(self, name, parent=None):
         super().__init__()
         self.nameString = name
-        self.setObjectName("pages_ebookpage")
+        self.setObjectName("ebookPage")
         self.parent = parent
         self.layout = QVBoxLayout(self)
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.layout.setSpacing(0)
-        self.layout.setObjectName("ebookpage_layout")
-        with open("epookman_gui/ui/QSS/ebookPage.qss", "r") as f:
-            self.setStyleSheet(f.read())
-
+        self.layout.setObjectName("ebookPageLayout")
         self.setTopBar()
 
         content = EbookPageContent(self, name)
@@ -115,21 +112,21 @@ class EbookPage(QWidget):
         self.topbar.setMaximumSize(QSize(16777215, 130))
         self.topbar.setFrameShape(QFrame.NoFrame)
         self.topbar.setFrameShadow(QFrame.Raised)
-        self.topbar.setObjectName("ebookpage_topbar")
+        self.topbar.setObjectName("ebookPageTopbar")
         self.topbarLayout = QHBoxLayout(self.topbar)
         self.topbarLayout.setContentsMargins(30, 50, 60, 10)
         self.topbarLayout.setSpacing(0)
-        self.topbarLayout.setObjectName("ebookPage_topbar_layout")
+        self.topbarLayout.setObjectName("ebookPageTopbarLayout")
 
     def setLabels(self, name):
         self.pageName = QLabel(self.topbar)
-        self.pageName.setObjectName("ebookpage_pagename_%s" % name)
+        self.pageName.setObjectName("ebookPageTitle")
         self.setPageName(name)
 
     def setInputs(self):
         self.search = QLineEdit(self.topbar)
         self.search.setMaximumSize(QSize(EBOOKPAGE_SEARCH_WIDTH, 16777215))
-        self.search.setObjectName("ebookpage_search")
+        self.search.setObjectName("ebookPageSearch")
         self.search.setPlaceholderText("Search")
         self.search.textChanged.connect(self.searchHandler)
 

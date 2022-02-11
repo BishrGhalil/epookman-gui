@@ -27,6 +27,28 @@ def close_connection(conn):
 # Create tables functions
 
 
+def create_settings_table(conn):
+    cur = conn
+    cur.execute(
+            "CREATE TABLE IF NOT EXISTS SETTINGS(" \
+            "ID INTEGER PRIMARY KEY AUTOINCREMENT," \
+            "OPTION           TEXT NOT NULL," \
+            "VALUE           TEXT NOT NULL);" \
+    )
+
+    conn.commit()
+
+
+def create_settings_indexes(conn):
+    cur = conn.cursor()
+    cur.execute(
+        "CREATE INDEX IF NOT EXISTS " \
+        f"idx_option ON SETTINGS (OPTION);"
+    )
+
+    conn.commit()
+
+
 def create_dirs_table(conn):
     cur = conn.cursor()
     cur.execute(
@@ -76,6 +98,8 @@ def create_tables(conn):
     create_dirs_table(conn)
     create_ebooks_table(conn)
     create_ebooks_indexes(conn)
+    create_settings_table(conn)
+    create_settings_indexes(conn)
 
 
 # Insert and update functions
@@ -94,6 +118,18 @@ def commit_dir(conn, Dir):
         INTO DIRS (ID, PATH, RECURS) \
         VALUES \
         ((SELECT ID FROM DIRS WHERE PATH = ?), ?, ?);", data)
+
+    conn.commit()
+
+
+def commit_option(conn, option, value):
+    cur = conn.cursor()
+    data = (option, option, value)
+    cur.execute(
+        "INSERT OR REPLACE " \
+        "INTO SETTINGS (ID, OPTION, VALUE) " \
+        "VALUES " \
+        "((SELECT ID FROM SETTINGS WHERE OPTION = ?), ?, ?);", data)
 
     conn.commit()
 

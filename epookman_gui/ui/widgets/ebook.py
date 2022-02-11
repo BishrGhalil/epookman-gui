@@ -72,8 +72,8 @@ class EbookItem(QListWidgetItem):
 
         self.setIcon(QIcon(img))
 
-    def markFav(self):
-        self.ebook.toggle_fav()
+    def markFav(self, fav):
+        self.ebook.fav = fav
         self.commit()
 
     def markDone(self):
@@ -87,6 +87,9 @@ class EbookItem(QListWidgetItem):
     def markReading(self):
         self.ebook.set_status(STATUS_READING)
         self.commit()
+
+    def update_metadata(self):
+        self.ebook.set_metadata(self.ebook.get_meta_data_string())
 
     def commit(self):
         conn = connect(DB_PATH)
