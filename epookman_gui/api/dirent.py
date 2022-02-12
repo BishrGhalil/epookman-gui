@@ -7,7 +7,6 @@
 
 import os
 from sys import stderr
-from timeIt import timeIt
 
 
 def check_path(path):

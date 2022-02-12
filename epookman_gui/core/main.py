@@ -5,8 +5,6 @@
 # License: MIT, see the file "LICENCS" for details.
 """The Main Class responsible to initialize the EM object and stuff."""
 
-import curses
-import pdb
 from sys import argv
 from os import (getenv, path, mkdir)
 
