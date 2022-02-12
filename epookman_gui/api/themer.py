@@ -1,20 +1,29 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# This file is part of epookman_gui, the console ebook manager.
+# This file is part of epookman_gui.
 # License: MIT, see the file "LICENCS" for details.
 """Epookman theme generator"""
 
 import re
 from json import loads
+from os import (getenv, path)
 
 
 def themer(theme) -> str:
     colors = {}
-    with open(f"epookman_gui/ui/themes/{theme}.json", "r") as theme_file:
+    home = path.expanduser('~')
+    themes_path = path.join(home, ".config/epookman-gui/themes")
+    try:
+        if not path.lexists(themes_path):
+            themes_path = "epookman_gui/ui/themes"
+    except:
+        return ""
+
+    with open(f"{themes_path}/{theme}.json", "r") as theme_file:
         colors = loads(theme_file.read())
 
     style = ""
-    with open("epookman_gui/ui/themes/style.qss", "r") as style_file:
+    with open(f"{themes_path}/style.qss", "r") as style_file:
         style = style_file.read()
         for color in colors:
             style = re.sub(color, colors[color], style)

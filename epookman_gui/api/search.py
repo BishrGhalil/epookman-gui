@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# This file is part of epookman_gui.
+# License: MIT, see the file "LICENCS" for details.
+"""Search for ebooks"""
+
 from os import (path, getenv)
 
 from epookman_gui.api.db import (DB_PATH, commit_ebooks, connect, fetch_ebooks)

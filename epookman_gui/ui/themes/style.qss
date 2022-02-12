@@ -147,7 +147,7 @@ QListWidget {
   outline: none;
   border: none;
   font: 18px;
-  color: @white;
+  color: @accent;
 }
 
 /* ********** CONTEXT Menu *************** */

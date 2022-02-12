@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# This file is part of epookman_gui, the console ebook manager.
+# This file is part of epookman_gui.
 # License: MIT, see the file "LICENCS" for details.
 """The Main Class responsible to initialize the EM object and stuff."""
 
@@ -10,7 +10,8 @@ from os import (getenv, path, mkdir)
 
 from PyQt5 import (QtCore, QtGui, QtWidgets)
 from epookman_gui.ui.widgets.mainWindow import (Ui_MainWindow)
-from epookman_gui.api.db import (DB_PATH, connect, create_tables, commit_option)
+from epookman_gui.api.db import (DB_PATH, connect, create_tables,
+                                 commit_option)
 
 
 class MainWindow(QtWidgets.QMainWindow):

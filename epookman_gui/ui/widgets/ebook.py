@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# This file is part of epookman_gui, the console ebook manager.
+# This file is part of epookman_gui.
 # License: MIT, see the file "LICENCS" for details.
 
 import subprocess
@@ -26,7 +26,7 @@ THUMBNAIL_HEIGHT = 128 * FRAME_SCALE
 EBOOKFRAME_WIDTH = THUMBNAIL_WIDTH
 EBOOKFRAME_HEIGHT = THUMBNAIL_HEIGHT + FONT_HEIGHT
 
-THUMBNAILS_DIR = path.join(getenv("HOME"), ".cache", "epookman-gui",
+THUMBNAILS_DIR = path.join(path.expanduser("~"), ".cache", "epookman-gui",
                            "thumbnails")
 
 
@@ -65,7 +65,10 @@ class EbookItem(QListWidgetItem):
             img = QPixmap(self.thumbnail_file)
 
         if img.isNull():
-            img = QPixmap("epookman_gui/ui/resources/document.png")
+            img_path = "epookman_gui/ui/resources/document.png"
+            if not path.lexists(img_path):
+                img_path = path.join(path.expanduser("~"), ".config/epookman-gui/resources/document.png")
+            img = QPixmap(img_path)
 
         img = img.scaled(THUMBNAIL_WIDTH * QUALITY_SCALE,
                          THUMBNAIL_HEIGHT * QUALITY_SCALE)

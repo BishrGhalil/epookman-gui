@@ -1,6 +1,6 @@
-# This file is part of epookman_gui, the console ebook manager.
+# This file is part of epookman_gui.
 # License: MIT, see the file "LICENSE" for details.
-"""A terminal ebook manager written in Python. Inspired by ranger file manager. It supports VI key bindings, And provides a minimalistic curses interface.
+"""A Gui ebook manager written in Python And Qt.
 """
 
 import os
