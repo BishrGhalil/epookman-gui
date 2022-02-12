@@ -1,6 +1,5 @@
-# epookman
-epookman is a terminal ebook manager written in Python. Inspired by [ranger](https://github.com/ranger/ranger) file manager.
-It supports VI key bindings, And provides a minimalistic curses interface.
+# epookman-gui
+epookman-gui is a gui ebook manager written in Python and Qt.
 
 > Under Development
 
