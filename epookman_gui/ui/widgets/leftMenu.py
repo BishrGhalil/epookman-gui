@@ -95,14 +95,6 @@ class LeftMenu(QFrame):
         self.fav.setCursor(QCursor(Qt.PointingHandCursor))
         self.fav.setToolTip("My Favorites Books")
 
-        self.folders = QPushButton(self.topMenus)
-        self.folders.setMinimumSize(
-            QSize(LEFTMENU_BUTTON_WIDTH, LEFTMENU_BUTTON_HEIGHT))
-        self.folders.setObjectName("leftmenuButton")
-        self.folders.setText("FOLDERS")
-        self.folders.setCursor(QCursor(Qt.PointingHandCursor))
-        self.folders.setToolTip("Browse Books By Folders")
-
         self.settings = QPushButton(self.topMenus)
         self.settings.setMinimumSize(
             QSize(LEFTMENU_BUTTON_WIDTH, LEFTMENU_BUTTON_HEIGHT))
@@ -111,13 +103,12 @@ class LeftMenu(QFrame):
         self.settings.setCursor(QCursor(Qt.PointingHandCursor))
         self.settings.setToolTip("App settings")
 
-        self.buttons = (self.all, self.fav, self.settings, self.folders,
-                        self.done, self.reading, self.toread)
+        self.buttons = (self.all, self.fav, self.settings, self.done,
+                        self.reading, self.toread)
 
     def setLayoutes(self):
         self.topMenusLayout.addWidget(self.toggle)
         self.topMenusLayout.addWidget(self.all)
-        self.topMenusLayout.addWidget(self.folders)
         self.topMenusLayout.addWidget(self.reading)
         self.topMenusLayout.addWidget(self.toread)
         self.topMenusLayout.addWidget(self.fav)

@@ -85,9 +85,6 @@ class Ui_MainWindow(object):
         button = self.leftMenu.fav
         self.connectButton(button, leftMenufunc, "FAV")
 
-        button = self.leftMenu.folders
-        self.connectButton(button, leftMenufunc, "FOLDERS")
-
         button = self.leftMenu.settings
         self.connectButton(button, leftMenufunc, "SETTINGS")
 
