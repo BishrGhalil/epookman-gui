@@ -225,3 +225,9 @@ def fetch_dirs(conn):
         dirs.append(Dir)
 
     return dirs
+
+def fetch_option(conn, option):
+    cur = conn.cursor()
+    res = cur.execute(f"SELECT VALUE FROM SETTINGS WHERE OPTION='{option}'")
+    for row in res:
+        return row[0]

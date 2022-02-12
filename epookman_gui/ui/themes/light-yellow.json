@@ -1,0 +1,11 @@
+{
+  "@accent":       "@yellow",
+  "@background":   "#ffffff",
+  "@gray":         "#e8e8e8",
+  "@green":        "#98c379",
+  "@red":          "#be5046",
+  "@yellow":       "#ffb86c",
+  "@blue":         "#61afef",
+  "@white":        "#abb2bf",
+  "@pink":         "#c678dd"
+}

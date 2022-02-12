@@ -12,7 +12,7 @@ from os import (getenv, path, mkdir)
 
 from PyQt5 import (QtCore, QtGui, QtWidgets)
 from epookman_gui.ui.widgets.mainWindow import (Ui_MainWindow)
-from epookman_gui.api.db import (DB_PATH, connect, create_tables)
+from epookman_gui.api.db import (DB_PATH, connect, create_tables, commit_option)
 
 
 class MainWindow(QtWidgets.QMainWindow):

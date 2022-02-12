@@ -6,12 +6,17 @@ from PyQt5.QtCore import QRect, QSize, Qt, QThread, pyqtSignal
 from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import (QFileDialog, QFrame, QHBoxLayout, QLabel,
                              QListView, QListWidget, QMessageBox, QProgressBar,
-                             QPushButton, QScrollArea, QVBoxLayout, QWidget)
+                             QPushButton, QScrollArea, QVBoxLayout, QWidget,
+                             QComboBox)
 
 from epookman_gui.api.db import (DB_PATH, commit_dir, commit_ebook, connect,
                                  del_dir, del_ebooks, fetch_dirs)
 from epookman_gui.api.dirent import Dirent
 from epookman_gui.api.search import scaneOneByOne
+from epookman_gui.api.db import (connect, DB_PATH, fetch_option)
+
+MAXIMUM_QT_NUMBER = 16777215
+DIRS_LIST_HEIGHT = 200
 
 
 class scaneThread(QThread):
@@ -50,6 +55,7 @@ class Content(QFrame):
         self.layout = QVBoxLayout(self)
         self.layout.setObjectName("settingsContentLayout")
         self.layout.setContentsMargins(30, 0, 30, 0)
+        self.layout.setSpacing(20)
 
         self.dirs = {}
 
@@ -59,6 +65,9 @@ class Content(QFrame):
         self.setButtons()
         self.setProgressBars()
         self.setList()
+        self.setThemingFrame()
+        self.setThemingMenu()
+        self.setLabels()
         self.setLayoutes()
         self.list.itemDoubleClicked.connect(self.showDelDialog)
 
@@ -67,13 +76,17 @@ class Content(QFrame):
         self.scrollArea.setFrameShape(QFrame.NoFrame)
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("settingsScrollarea")
+        self.scrollArea.setMaximumSize(
+            QSize(MAXIMUM_QT_NUMBER, DIRS_LIST_HEIGHT))
 
         self.scrollAreaContent = QWidget()
+        self.scrollAreaContent.setMaximumSize(
+            QSize(MAXIMUM_QT_NUMBER, DIRS_LIST_HEIGHT))
         self.scrollAreaContent.setObjectName("settingsScrollareaContent")
         self.scrollAreaLayout = QHBoxLayout(self.scrollAreaContent)
         self.scrollAreaLayout.setContentsMargins(0, 0, 0, 0)
-        self.scrollAreaLayout.setObjectName(
-            "settingsContentScrollareaLayout")
+        self.scrollAreaLayout.setObjectName("settingsContentScrollareaLayout")
+        self.scrollAreaLayout.setAlignment(Qt.AlignTop)
 
     def setLayoutes(self):
         self.scaneFrameLayout.addWidget(self.scane)
@@ -86,14 +99,18 @@ class Content(QFrame):
         self.dirsControleFrameLayout.addWidget(self.buttons)
 
         self.scrollAreaLayout.addWidget(self.dirsControleFrame)
-
         self.scrollArea.setWidget(self.scrollAreaContent)
+
+        self.themingFrameLayout.addWidget(self.themingLabel)
+        self.themingFrameLayout.addWidget(self.themingMenu)
 
         self.layout.addWidget(self.scaneFrame)
         self.layout.addWidget(self.scrollArea)
+        self.layout.addWidget(self.themingFrame)
 
     def setScaneFrame(self):
         self.scaneFrame = QFrame(self)
+        self.scaneFrame.setMaximumSize(QSize(MAXIMUM_QT_NUMBER, 130))
         self.scaneFrameLayout = QVBoxLayout(self.scaneFrame)
         self.scaneFrameLayout.setContentsMargins(0, 0, 0, 10)
         self.scaneFrameLayout.setSpacing(5)
@@ -101,10 +118,19 @@ class Content(QFrame):
 
     def setDirsControleFrame(self):
         self.dirsControleFrame = QFrame(self)
+        self.dirsControleFrame.setMaximumSize(
+            QSize(MAXIMUM_QT_NUMBER, DIRS_LIST_HEIGHT))
         self.dirsControleFrameLayout = QHBoxLayout(self.dirsControleFrame)
         self.dirsControleFrameLayout.setContentsMargins(0, 0, 0, 0)
         self.dirsControleFrameLayout.setSpacing(10)
         self.dirsControleFrameLayout.setAlignment(Qt.AlignTop)
+
+    def setThemingFrame(self):
+        self.themingFrame = QFrame(self)
+        self.themingFrameLayout = QHBoxLayout(self.themingFrame)
+        self.themingFrameLayout.setContentsMargins(0, 0, 0, 0)
+        self.themingFrameLayout.setSpacing(0)
+        self.themingFrameLayout.setAlignment(Qt.AlignTop)
 
     def setButtons(self):
         self.buttons = QFrame(self.dirsControleFrame)
@@ -115,18 +141,43 @@ class Content(QFrame):
         self.buttonsLayout.setAlignment(Qt.AlignTop)
 
         self.scane = QPushButton(self.buttons)
-        self.scane.setMinimumSize(QSize(16777215, 50))
+        self.scane.setMinimumSize(QSize(MAXIMUM_QT_NUMBER, 50))
         self.scane.setObjectName("scaneButton")
         self.scane.setText("RESCANE")
         self.scane.setCursor(QCursor(Qt.PointingHandCursor))
         self.scane.clicked.connect(self.scaneUpdateProgressBar)
 
         self.addDir = QPushButton(self.buttons)
-        self.addDir.setMinimumSize(QSize(16777215, 50))
+        self.addDir.setMinimumSize(QSize(MAXIMUM_QT_NUMBER, 50))
         self.addDir.setObjectName("addDirButton")
         self.addDir.setText("ADD DIR")
         self.addDir.setCursor(QCursor(Qt.PointingHandCursor))
         self.addDir.clicked.connect(self.addDirScane)
+
+    def setLabels(self):
+        self.themingLabel = QLabel(self.themingFrame)
+        self.themingLabel.setObjectName("themingLabel")
+        self.themingLabel.setText("Theme")
+        self.themingLabel.setMaximumSize(QSize(150, MAXIMUM_QT_NUMBER))
+
+    def setThemingMenu(self):
+        self.themes = [
+            "dark-purple", "dark-blue", "dark-red", "dark-yellow",
+            "light-purple", "light-blue", "light-red", "light-yellow",
+            "black&white", "white&black"
+        ]
+
+        self.themingMenu = QComboBox(self.themingFrame)
+        self.themingMenu.setMaximumSize(QSize(300, 100))
+        conn = connect(DB_PATH)
+        default_theme = fetch_option(conn, "DEFAULT_THEME")
+        conn.close()
+
+        for theme in self.themes:
+            self.themingMenu.addItem(theme)
+
+        index = self.themes.index(default_theme)
+        self.themingMenu.setCurrentIndex(index)
 
     def setProgressBars(self):
         self.vpbar = QProgressBar(self.buttons)
@@ -145,7 +196,7 @@ class Content(QFrame):
         self.list.setViewMode(QListView.ListMode)
         self.list.setCursor(QCursor(Qt.PointingHandCursor))
         self.list.setSpacing(2)
-        self.list.setMaximumSize(QSize(1300, 400))
+        self.list.setMaximumSize(QSize(1300, 200))
         self.list.setObjectName("dirsList")
 
         self.setListItems()
@@ -255,7 +306,7 @@ class SettingsPage(QWidget):
 
     def setTopbar(self):
         self.topbar = QFrame(self)
-        self.topbar.setMaximumSize(QSize(16777215, 130))
+        self.topbar.setMaximumSize(QSize(MAXIMUM_QT_NUMBER, 130))
         self.topbar.setFrameShape(QFrame.NoFrame)
         self.topbar.setFrameShadow(QFrame.Raised)
         self.topbar.setObjectName("settingsPage_topbar")

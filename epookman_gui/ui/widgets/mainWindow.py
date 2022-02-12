@@ -2,11 +2,14 @@
 # -*- coding: utf-8 -*-
 # This file is part of epookman_gui, the console ebook manager.
 # License: MIT, see the file "LICENCS" for details.
+
 from PyQt5.QtCore import (QCoreApplication, QSize)
 from PyQt5.QtWidgets import (QFrame, QHBoxLayout, QVBoxLayout, QWidget,
                              QMessageBox)
 from epookman_gui.ui.widgets.leftMenu import LeftMenu
 from epookman_gui.ui.widgets.pages import Pages
+from epookman_gui.api.themer import themer
+from epookman_gui.api.db import (fetch_option, commit_option, connect, DB_PATH)
 
 MAINWINDOW_WIDTH_MIN = 1000
 MAINWINDOW_HEIGHT_MIN = 500
@@ -15,9 +18,7 @@ MAINWINDOW_WIDTH = 1400
 MAINWINDOW_HEIGHT = 700
 
 DEFAULT_PAGE = "ALL"
-
-MESSAGEBOX_WIDTH = 200
-MESSAGEBOX_HEIGHT = 100
+DEFAULT_THEME = "dark-purple"
 
 
 class Ui_MainWindow(object):
@@ -30,8 +31,8 @@ class Ui_MainWindow(object):
         MainWindow.resize(MAINWINDOW_WIDTH, MAINWINDOW_HEIGHT)
         MainWindow.setMinimumSize(
             QSize(MAINWINDOW_WIDTH_MIN, MAINWINDOW_HEIGHT_MIN))
-        with open("epookman_gui/ui/themes/dracula.qss", "r") as f:
-            MainWindow.setStyleSheet(f.read())
+        styleSheet = self.getDefaultStyle()
+        MainWindow.setStyleSheet(styleSheet)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
 
@@ -59,6 +60,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.setButtons()
+        self.connectThemingMenu()
         if self.pages.settingsPage.content.dirs:
             self.setDefaultPage("ALL")
         else:
@@ -93,14 +95,31 @@ class Ui_MainWindow(object):
         button.setMouseTracking(True)
         button.mousePressEvent = lambda event: func(*args)
 
+    def connectThemingMenu(self):
+        self.pages.settingsPage.content.themingMenu.currentTextChanged.connect(
+            self.changeTheme)
+
+    def changeTheme(self, theme):
+        conn = connect(DB_PATH)
+        commit_option(conn, "DEFAULT_THEME", theme)
+        conn.close()
+        styleSheet = themer(theme)
+        self.centralwidget.setStyleSheet(styleSheet)
+
+    def getDefaultStyle(self):
+        conn = connect(DB_PATH)
+        theme = fetch_option(conn, "DEFAULT_THEME")
+        if not theme:
+            theme = DEFAULT_THEME
+
+        self.theme = theme
+        styleSheet = themer(theme)
+        conn.close()
+        return styleSheet
+
     def retranslateUi(self, MainWindow):
         _translate = translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.logo.setText(
-            _translate(
-                "MainWindow",
-                "<html><head/><body><p align=\"center\"><span style=\" font-size:15pt;\">EPOOKMAN</span></p></body></html>"
-            ))
 
     def setDefaultPage(self, name=None):
         if not name:

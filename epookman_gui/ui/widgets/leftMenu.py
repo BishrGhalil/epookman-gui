@@ -14,8 +14,6 @@ LEFTMENU_MINIMIZED_WIDTH = 50
 LEFTMENU_BUTTON_HEIGHT = 50
 LEFTMENU_BUTTON_WIDTH = 0
 
-LEFTMENU_TOGGLE_ICON = 25
-
 LEFTMENU_EXTENDED = False
 
 
@@ -53,10 +51,7 @@ class LeftMenu(QFrame):
         self.toggle.setMinimumSize(
             QSize(LEFTMENU_BUTTON_WIDTH, LEFTMENU_BUTTON_HEIGHT))
         self.toggle.setObjectName("leftmenuButtonToggle")
-        icon = QIcon("epookman_gui/ui/resources/toggle.png")
-        self.toggle.setIcon(icon)
-        self.toggle.setIconSize(
-            QSize(LEFTMENU_TOGGLE_ICON, LEFTMENU_TOGGLE_ICON))
+        self.toggle.setText("")
         self.toggle.setCursor(QCursor(Qt.PointingHandCursor))
         self.toggle.clicked.connect(self.toggleAnimate)
 
