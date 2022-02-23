@@ -1,8 +1,8 @@
 all: install
 
 install:
-	pip install -r requirements.txt
-	python setup.py install_exec install --optimize=1 --record=install_log.log
+	pip3 install -r requirements.txt
+	python3 setup.py install_exec install --optimize=1 --record=install_log.log
 
 uninstall:
 	rm -rf ~/.local/bin/epookman-gui
