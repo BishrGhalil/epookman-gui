@@ -3,9 +3,9 @@
 # This file is part of epookman_gui.
 # License: MIT, see the file "LICENCS" for details.
 
-from os import getenv, path
+from os import (getenv, path)
 
-from PyQt5.QtCore import QRect, QSize, Qt, QThread, pyqtSignal
+from PyQt5.QtCore import (QRect, QSize, Qt, QThread, pyqtSignal, QUrl)
 from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import (QFileDialog, QFrame, QHBoxLayout, QLabel,
                              QListView, QListWidget, QMessageBox, QProgressBar,
@@ -13,7 +13,8 @@ from PyQt5.QtWidgets import (QFileDialog, QFrame, QHBoxLayout, QLabel,
                              QComboBox)
 
 from epookman_gui.api.db import (DB_PATH, commit_dir, commit_ebook, connect,
-                                 del_dir, del_ebooks, fetch_dirs)
+                                 commit_option, del_dir, del_ebooks,
+                                 fetch_dirs)
 from epookman_gui.api.dirent import Dirent
 from epookman_gui.api.search import scaneOneByOne
 from epookman_gui.api.db import (connect, DB_PATH, fetch_option)
@@ -58,21 +59,23 @@ class Content(QFrame):
         self.layout = QVBoxLayout(self)
         self.layout.setObjectName("settingsContentLayout")
         self.layout.setContentsMargins(30, 0, 30, 0)
-        self.layout.setSpacing(20)
+        self.layout.setSpacing(10)
 
         self.dirs = {}
 
         self.setScrollArea()
         self.setDirsControleFrame()
-        self.setScaneFrame()
+        self.setProgressBarsFrame()
+        self.setThemingFrame()
+        self.setEbookReaderFrame()
+        self.setEmptyFrame()
+
         self.setButtons()
         self.setProgressBars()
         self.setList()
-        self.setThemingFrame()
         self.setThemingMenu()
         self.setLabels()
         self.setLayoutes()
-        self.list.itemDoubleClicked.connect(self.showDelDialog)
 
     def setScrollArea(self):
         self.scrollArea = QScrollArea(self)
@@ -91,49 +94,13 @@ class Content(QFrame):
         self.scrollAreaLayout.setObjectName("settingsContentScrollareaLayout")
         self.scrollAreaLayout.setAlignment(Qt.AlignTop)
 
-    def setLayoutes(self):
-        self.scaneFrameLayout.addWidget(self.scane)
-        self.scaneFrameLayout.addWidget(self.dpbar)
-        self.scaneFrameLayout.addWidget(self.vpbar)
-
-        self.buttonsLayout.addWidget(self.addDir)
-
-        self.dirsControleFrameLayout.addWidget(self.list)
-        self.dirsControleFrameLayout.addWidget(self.buttons)
-
-        self.scrollAreaLayout.addWidget(self.dirsControleFrame)
-        self.scrollArea.setWidget(self.scrollAreaContent)
-
-        self.themingFrameLayout.addWidget(self.themingLabel)
-        self.themingFrameLayout.addWidget(self.themingMenu)
-
-        self.layout.addWidget(self.scaneFrame)
-        self.layout.addWidget(self.scrollArea)
-        self.layout.addWidget(self.themingFrame)
-
-    def setScaneFrame(self):
-        self.scaneFrame = QFrame(self)
-        self.scaneFrame.setMaximumSize(QSize(MAXIMUM_QT_NUMBER, 130))
-        self.scaneFrameLayout = QVBoxLayout(self.scaneFrame)
-        self.scaneFrameLayout.setContentsMargins(0, 0, 0, 10)
-        self.scaneFrameLayout.setSpacing(5)
-        self.scaneFrameLayout.setAlignment(Qt.AlignTop)
-
     def setDirsControleFrame(self):
         self.dirsControleFrame = QFrame(self)
-        self.dirsControleFrame.setMaximumSize(
-            QSize(MAXIMUM_QT_NUMBER, DIRS_LIST_HEIGHT))
+        self.dirsControleFrame.setFrameShape(QFrame.NoFrame)
         self.dirsControleFrameLayout = QHBoxLayout(self.dirsControleFrame)
         self.dirsControleFrameLayout.setContentsMargins(0, 0, 0, 0)
         self.dirsControleFrameLayout.setSpacing(10)
         self.dirsControleFrameLayout.setAlignment(Qt.AlignTop)
-
-    def setThemingFrame(self):
-        self.themingFrame = QFrame(self)
-        self.themingFrameLayout = QHBoxLayout(self.themingFrame)
-        self.themingFrameLayout.setContentsMargins(0, 0, 0, 0)
-        self.themingFrameLayout.setSpacing(0)
-        self.themingFrameLayout.setAlignment(Qt.AlignTop)
 
     def setButtons(self):
         self.buttons = QFrame(self.dirsControleFrame)
@@ -142,6 +109,14 @@ class Content(QFrame):
         self.buttonsLayout.setSpacing(5)
         self.buttonsLayout.setObjectName("settingsContentButtonsLayout")
         self.buttonsLayout.setAlignment(Qt.AlignTop)
+
+        self.ebookReaderButton = QPushButton(self.buttons)
+        default_reader = self.getDefaultEbookReader()
+        self.ebookReaderButton.setText(f"{default_reader}, Click to change it")
+        self.ebookReaderButton.clicked.connect(self.selectEbookReaderDialog)
+        self.ebookReaderButton.setObjectName("scaneButton")
+        self.ebookReaderButton.setCursor(QCursor(Qt.PointingHandCursor))
+        self.ebookReaderButton.setMinimumSize(QSize(250, 50))
 
         self.scane = QPushButton(self.buttons)
         self.scane.setMinimumSize(QSize(MAXIMUM_QT_NUMBER, 50))
@@ -157,17 +132,69 @@ class Content(QFrame):
         self.addDir.setCursor(QCursor(Qt.PointingHandCursor))
         self.addDir.clicked.connect(self.addDirScane)
 
+    def setProgressBarsFrame(self):
+        self.progressBarsFrame = QFrame(self)
+        self.progressBarsFrame.setObjectName("progressBarsFrame")
+        self.progressBarsFrame.setFrameShape(QFrame.NoFrame)
+        self.progressBarsFrame.setMaximumSize(QSize(MAXIMUM_QT_NUMBER, 80))
+        self.progressBarsFrameLayout = QVBoxLayout(self.progressBarsFrame)
+        self.progressBarsFrameLayout.setContentsMargins(0, 0, 0, 0)
+        self.progressBarsFrameLayout.setSpacing(5)
+        self.progressBarsFrameLayout.setAlignment(Qt.AlignTop)
+
+    def setThemingFrame(self):
+        self.themingFrame = QFrame(self)
+        self.themingFrame.setFrameShape(QFrame.NoFrame)
+        self.themingFrame.setObjectName("themingFrame")
+        self.themingFrameLayout = QHBoxLayout(self.themingFrame)
+        self.themingFrameLayout.setContentsMargins(0, 0, 0, 0)
+        self.themingFrameLayout.setSpacing(10)
+        self.themingFrameLayout.setAlignment(Qt.AlignTop)
+        self.themingFrame.setMaximumSize(QSize(300, 40))
+
+    def setEbookReaderFrame(self):
+        self.ebookReaderFrame = QFrame(self)
+        self.ebookReaderFrame.setFrameShape(QFrame.NoFrame)
+        self.ebookReaderFrame.setObjectName("ebookReaderFrame")
+        self.ebookReaderLayout = QHBoxLayout(self.ebookReaderFrame)
+        self.ebookReaderLayout.setContentsMargins(0, 0, 0, 0)
+        self.ebookReaderLayout.setSpacing(10)
+        self.ebookReaderLayout.setAlignment(Qt.AlignTop | Qt.AlignLeft)
+        self.ebookReaderFrame.setMaximumSize(QSize(500, 100))
+
+    def getDefaultEbookReader(self):
+        conn = connect(DB_PATH)
+        default_reader = fetch_option(conn, "DEFAULT_READER")
+        conn.close()
+        if not default_reader:
+            default_reader = "xdg-open"
+        else:
+            default_reader = path.basename(default_reader)
+
+        return default_reader
+
+    def setEmptyFrame(self):
+        self.emptyFrame = QFrame(self)
+        self.emptyFrame.setFrameShape(QFrame.NoFrame)
+        self.emptyFrame.setObjectName("ebookReaderFrame")
+
     def setLabels(self):
         self.themingLabel = QLabel(self.themingFrame)
         self.themingLabel.setObjectName("themingLabel")
-        self.themingLabel.setText("Theme")
-        self.themingLabel.setMaximumSize(QSize(150, MAXIMUM_QT_NUMBER))
+        text = "Theme"
+        self.themingLabel.setText(text)
+        self.themingLabel.setMaximumSize(QSize(80, MAXIMUM_QT_NUMBER))
+
+        self.ebookReaderLabel = QLabel(self.ebookReaderFrame)
+        self.ebookReaderLabel.setObjectName("themingLabel")
+        self.ebookReaderLabel.setText("Reader:")
+        self.ebookReaderLabel.setMaximumSize(QSize(80, MAXIMUM_QT_NUMBER))
 
     def setThemingMenu(self):
         self.themes = [
-            "dark-purple", "dark-blue", "dark-red", "dark-yellow",
-            "light-purple", "light-blue", "light-red", "light-yellow",
-            "black&white", "white&black"
+            "black&white", "dark-purple", "dark-blue", "dark-red",
+            "dark-yellow", "light-purple", "light-blue", "light-red",
+            "light-yellow", "white&black"
         ]
 
         self.themingMenu = QComboBox(self.themingFrame)
@@ -179,15 +206,31 @@ class Content(QFrame):
         for theme in self.themes:
             self.themingMenu.addItem(theme)
 
-        index = self.themes.index(default_theme)
+        if not default_theme:
+            index = 0
+        else:
+            index = self.themes.index(default_theme)
+
         self.themingMenu.setCurrentIndex(index)
 
+    def selectEbookReaderDialog(self):
+        appsPath = "/usr/bin"
+        ebookReaderDialog = QFileDialog(None)
+        ebookReaderDialog.setDirectory(appsPath)
+        ebookReaderUrl = ebookReaderDialog.getOpenFileUrl()
+        ebookReaderUrl = ebookReaderUrl[0].path()
+        conn = connect(DB_PATH)
+        commit_option(conn, "DEFAULT_READER", ebookReaderUrl)
+        conn.close()
+        default_reader = self.getDefaultEbookReader()
+        self.ebookReaderButton.setText(f"{default_reader}, Click to change it")
+
     def setProgressBars(self):
-        self.vpbar = QProgressBar(self.buttons)
+        self.vpbar = QProgressBar(self.progressBarsFrame)
         self.vpbar.setMinimumSize(QSize(100, 10))
         self.vpbar.setObjectName("valuesProgressbar")
 
-        self.dpbar = QProgressBar(self.buttons)
+        self.dpbar = QProgressBar(self.progressBarsFrame)
         self.dpbar.setMinimumSize(QSize(100, 10))
         self.dpbar.setObjectName("dirsProgressbar")
         self.dpbar.setFormat("%v/%m")
@@ -199,10 +242,36 @@ class Content(QFrame):
         self.list.setViewMode(QListView.ListMode)
         self.list.setCursor(QCursor(Qt.PointingHandCursor))
         self.list.setSpacing(2)
-        self.list.setMaximumSize(QSize(1300, 200))
+        self.list.setMaximumSize(QSize(1300, DIRS_LIST_HEIGHT))
         self.list.setObjectName("dirsList")
 
         self.setListItems()
+        self.list.itemDoubleClicked.connect(self.showDelDialog)
+
+    def setLayoutes(self):
+        self.progressBarsFrameLayout.addWidget(self.dpbar)
+        self.progressBarsFrameLayout.addWidget(self.vpbar)
+
+        self.buttonsLayout.addWidget(self.addDir)
+        self.buttonsLayout.addWidget(self.scane)
+
+        self.dirsControleFrameLayout.addWidget(self.list)
+        self.dirsControleFrameLayout.addWidget(self.buttons)
+
+        self.scrollAreaLayout.addWidget(self.dirsControleFrame)
+        self.scrollArea.setWidget(self.scrollAreaContent)
+
+        self.themingFrameLayout.addWidget(self.themingLabel)
+        self.themingFrameLayout.addWidget(self.themingMenu)
+
+        self.ebookReaderLayout.addWidget(self.ebookReaderLabel)
+        self.ebookReaderLayout.addWidget(self.ebookReaderButton)
+
+        self.layout.addWidget(self.scrollArea)
+        self.layout.addWidget(self.progressBarsFrame)
+        self.layout.addWidget(self.themingFrame)
+        self.layout.addWidget(self.ebookReaderFrame)
+        self.layout.addWidget(self.emptyFrame)
 
     def scaneUpdateProgressBar(self, dirs=None):
         if not dirs:
@@ -222,7 +291,7 @@ class Content(QFrame):
 
     def addDirScane(self):
         documentsPath = path.join(getenv("HOME"), "Documents")
-        dirPath = QFileDialog.getExistingDirectory(self, "Choose A Directory",
+        dirPath = QFileDialog.getExistingDirectory(None, "Choose A Directory",
                                                    documentsPath)
         if not dirPath:
             return
@@ -271,6 +340,10 @@ class Content(QFrame):
         for _dir in dirs:
             self.dirs[_dir.path] = _dir
             self.list.addItem(_dir.path)
+
+        if len(dirs) < 1:
+            msg = "Start by adding some directories"
+            self.list.addItem(msg)
 
     def updateList(self):
         self.list.clear()

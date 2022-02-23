@@ -9,9 +9,10 @@ import subprocess
 from PyQt5.QtCore import QEvent, QSize, Qt
 from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import (QAction, QFrame, QListView, QListWidget,
-                             QListWidgetItem, QMenu)
+                             QListWidgetItem, QMenu, QMessageBox)
 from timeIt import timeIt
 
+from epookman_gui.api.db import DB_PATH, connect, fetch_option
 from epookman_gui.ui.widgets.ebook import (THUMBNAIL_HEIGHT, THUMBNAIL_WIDTH,
                                            EbookItem)
 
@@ -135,7 +136,19 @@ class ListWidget(QListWidget):
                 item.hide()
 
     def openEbook(self, item):
-        ereader = "zathura"
+        conn = connect(DB_PATH)
+        ebookReader = fetch_option(conn, "DEFAULT_READER")
+        conn.close()
         errFile = open("/dev/null", "w")
-        subprocess.Popen([ereader, item.ebook.path], stderr=errFile)
+        if not ebookReader:
+            msgBox = QMessageBox()
+            msgBox.setIcon(QMessageBox.Information)
+            msgBox.setText(
+                'Your ebooks reader is not set, Please go to settings and set it first.'
+            )
+            msgBox.setStandardButtons(QMessageBox.Ok)
+            retval = msgBox.exec_()
+            return
+
+        subprocess.Popen([ebookReader, item.ebook.path], stderr=errFile)
         item.markReading()

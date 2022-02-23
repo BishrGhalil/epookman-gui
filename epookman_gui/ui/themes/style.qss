@@ -223,6 +223,20 @@ QPushButton#scaneButton:hover {
   background-color: @accent;
 }
 
+
+QPushButton#readerButton {
+  color: @accent;
+  background-color: @background;
+  font: 25px;
+  text-align: left;
+}
+
+QPushButton#readerButton:hover {
+  color: @background;
+  background-color: @accent;
+}
+
+
 QPushButton#addDirButton {
   color: @accent;
   font: 18px;
@@ -248,7 +262,6 @@ QListWidget#dirsList::item {
 QListWidget#dirsList::item:focus {
   background-color: @accent;
   color: @background;
-  padding: 20px;
 }
 
 QProgressBar {
