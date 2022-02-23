@@ -167,7 +167,7 @@ class Content(QFrame):
         default_reader = fetch_option(conn, "DEFAULT_READER")
         conn.close()
         if not default_reader:
-            default_reader = "xdg-open"
+            default_reader = "None"
         else:
             default_reader = path.basename(default_reader)
 
