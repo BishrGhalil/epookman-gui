@@ -10,8 +10,6 @@ from PyQt5.QtCore import QEvent, QSize, Qt
 from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import (QAction, QFrame, QListView, QListWidget,
                              QListWidgetItem, QMenu, QMessageBox)
-from timeIt import timeIt
-
 from epookman_gui.api.db import DB_PATH, connect, fetch_option
 from epookman_gui.ui.widgets.ebook import (THUMBNAIL_HEIGHT, THUMBNAIL_WIDTH,
                                            EbookItem)
