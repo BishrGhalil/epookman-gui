@@ -8,7 +8,6 @@
 from re import search
 
 import magic
-from timeIt import timeIt
 
 MIME_TYPE_EBOOK_PDF = 0
 MIME_TYPE_EBOOK_EPUB = 1
