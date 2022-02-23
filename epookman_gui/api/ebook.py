@@ -6,11 +6,9 @@
 """Ebook functions and consts"""
 
 import os
-
-import epub_meta
-import PyPDF2
+from epub_meta import get_epub_metadata
 from PyPDF2 import PdfFileReader
-import re
+from re import search
 
 EBOOK_TYPE_PDF = 0
 EBOOK_TYPE_EPUB = 1
@@ -72,7 +70,7 @@ class Ebook():
     def set_type(self, _type):
         if type(_type) == str:
             for ebook_type in self.ebook_types.keys():
-                if re.search(ebook_type, _type):
+                if search(ebook_type, _type):
                     self.type = self.ebook_types.get(ebook_type)
                     return
         else:
@@ -146,9 +144,9 @@ class Ebook():
                         data["Creators"] = info.get('/Creator')
 
             elif self.type == self.ebook_types.get("epub"):
-                tmp_data = epub_meta.get_epub_metadata(path,
-                                                       read_cover_image=False,
-                                                       read_toc=False)
+                tmp_data = get_epub_metadata(path,
+                                             read_cover_image=False,
+                                             read_toc=False)
                 data["Creation"] = tmp_data.publication_date
         except Exception as e:
             data = dict()

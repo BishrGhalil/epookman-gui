@@ -5,7 +5,7 @@
 # License: MIT, see the file "LICENCS" for details.
 """Check file mime type"""
 
-import re
+from re import search
 
 import magic
 from timeIt import timeIt
@@ -35,7 +35,7 @@ class Mime():
     def mime_type(self, file):
         mime_t = self.mime.file(file)
         for ebook_type in self.re_ebooks_types.keys():
-            if re.search(ebook_type, mime_t):
+            if search(ebook_type, mime_t):
                 return self.re_ebooks_types.get(ebook_type)
         return None
 
@@ -48,7 +48,7 @@ class Mime():
 
     def is_ebook_from_path(self, file):
         for ebook_type in self.re_ebooks_types.keys():
-            if re.search(ebook_type, file):
+            if search(ebook_type, file):
                 return self.re_ebooks_types.get(ebook_type)
 
         return False

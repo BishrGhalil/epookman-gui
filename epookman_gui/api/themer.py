@@ -4,9 +4,9 @@
 # License: MIT, see the file "LICENCS" for details.
 """Epookman theme generator"""
 
-import re
 from json import loads
 from os import (getenv, path)
+from re import sub
 
 
 def themer(theme) -> str:
@@ -26,6 +26,6 @@ def themer(theme) -> str:
     with open(f"{themes_path}/style.qss", "r") as style_file:
         style = style_file.read()
         for color in colors:
-            style = re.sub(color, colors[color], style)
+            style = sub(color, colors[color], style)
 
     return style
