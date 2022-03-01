@@ -13,6 +13,7 @@ git clone https://github.com/BishrGhalil/epookman-gui.git
 cd epookman-gui
 sudo make install
 ```
+Make sure `~/.local/bin` is added to your PATH.
 
 # Features
 - Simple and beautiful interface

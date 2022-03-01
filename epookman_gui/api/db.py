@@ -11,7 +11,7 @@ from os import getenv, path
 from epookman_gui.api.dirent import Dirent
 from epookman_gui.api.ebook import Ebook
 
-DB_PATH = path.join(getenv("HOME"), "epookman.db")
+DB_PATH = path.join(getenv("HOME"), ".epookman.db")
 
 
 # Connect and Disconnect functions

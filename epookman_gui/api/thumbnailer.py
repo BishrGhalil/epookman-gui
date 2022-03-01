@@ -14,6 +14,9 @@ def thumbnailer(file, output):
         return -1
     if path.lexists(file):
         errFile = open("/dev/null", "w")
+        if subprocess.run(["which", "pdftocairo"]) != 0:
+            print("Please install poppler first.")
+            return -1
         return subprocess.run(
             ["pdftocairo", "-singlefile", file, "-png", output],
             stderr=errFile)
