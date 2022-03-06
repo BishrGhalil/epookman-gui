@@ -28,7 +28,7 @@ def close_connection(conn):
 
 
 def create_settings_table(conn):
-    cur = conn
+    cur = conn.cursor()
     cur.execute(
             "CREATE TABLE IF NOT EXISTS SETTINGS(" \
             "ID INTEGER PRIMARY KEY AUTOINCREMENT," \
