@@ -10,7 +10,7 @@ from os import (getenv, path, mkdir)
 
 from PyQt5.QtWidgets import (QApplication, QMainWindow)
 from epookman_gui.ui.widgets.mainWindow import (Ui_MainWindow)
-from epookman_gui.api.db import (DB_PATH, connect, create_tables,
+from epookman_gui.api.db import (connect, create_tables,
                                  commit_option)
 
 
@@ -47,7 +47,7 @@ def main():
             exit(0)
 
     createDirs()
-    conn = connect(DB_PATH)
+    conn = connect()
     create_tables(conn)
     conn.close()
     app = QApplication(argv)

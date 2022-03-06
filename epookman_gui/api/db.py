@@ -15,13 +15,9 @@ DB_PATH = path.join(getenv("HOME"), ".epookman.db")
 
 
 # Connect and Disconnect functions
-def connect(db_path):
+def connect(db_path=DB_PATH):
     conn = sqlite3.connect(db_path)
     return conn
-
-
-def close_connection(conn):
-    conn.close()
 
 
 # Create tables functions
@@ -225,6 +221,7 @@ def fetch_dirs(conn):
         dirs.append(Dir)
 
     return dirs
+
 
 def fetch_option(conn, option):
     cur = conn.cursor()

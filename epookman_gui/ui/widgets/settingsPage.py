@@ -12,12 +12,12 @@ from PyQt5.QtWidgets import (QFileDialog, QFrame, QHBoxLayout, QLabel,
                              QPushButton, QScrollArea, QVBoxLayout, QWidget,
                              QComboBox)
 
-from epookman_gui.api.db import (DB_PATH, commit_dir, commit_ebook, connect,
+from epookman_gui.api.db import (commit_dir, commit_ebook, connect,
                                  commit_option, del_dir, del_ebooks,
                                  fetch_dirs)
 from epookman_gui.api.dirent import Dirent
 from epookman_gui.api.search import scaneOneByOne
-from epookman_gui.api.db import (connect, DB_PATH, fetch_option)
+from epookman_gui.api.db import (connect, fetch_option)
 
 MAXIMUM_QT_NUMBER = 16777215
 DIRS_LIST_HEIGHT = 200
@@ -33,7 +33,7 @@ class scaneThread(QThread):
 
     def run(self):
 
-        conn = connect(DB_PATH)
+        conn = connect()
         totalDirs = len(self.dirs)
         for index, _dir in enumerate(self.dirs):
             dirPercent = int(((index) / (totalDirs)) * 100)
@@ -163,7 +163,7 @@ class Content(QFrame):
         self.ebookReaderFrame.setMaximumSize(QSize(500, 100))
 
     def getDefaultEbookReader(self):
-        conn = connect(DB_PATH)
+        conn = connect()
         default_reader = fetch_option(conn, "DEFAULT_READER")
         conn.close()
         if not default_reader:
@@ -199,7 +199,7 @@ class Content(QFrame):
 
         self.themingMenu = QComboBox(self.themingFrame)
         self.themingMenu.setMaximumSize(QSize(300, 100))
-        conn = connect(DB_PATH)
+        conn = connect()
         default_theme = fetch_option(conn, "DEFAULT_THEME")
         conn.close()
 
@@ -219,7 +219,7 @@ class Content(QFrame):
         ebookReaderDialog.setDirectory(appsPath)
         ebookReaderUrl = ebookReaderDialog.getOpenFileUrl()
         ebookReaderUrl = ebookReaderUrl[0].path()
-        conn = connect(DB_PATH)
+        conn = connect()
         commit_option(conn, "DEFAULT_READER", ebookReaderUrl)
         conn.close()
         default_reader = self.getDefaultEbookReader()
@@ -296,7 +296,7 @@ class Content(QFrame):
         if not dirPath:
             return
 
-        conn = connect(DB_PATH)
+        conn = connect()
         Dir = Dirent(dirPath)
         commit_dir(conn, Dir)
         conn.close()
@@ -324,7 +324,7 @@ class Content(QFrame):
         if button.text() != "OK":
             return
 
-        conn = connect(DB_PATH)
+        conn = connect()
         dirPath = item.text()
         del_dir(conn, dirPath)
         del_ebooks(conn, directory=dirPath)
@@ -333,7 +333,7 @@ class Content(QFrame):
         self.updateList()
 
     def setListItems(self):
-        conn = connect(DB_PATH)
+        conn = connect()
         dirs = fetch_dirs(conn)
         conn.close()
 

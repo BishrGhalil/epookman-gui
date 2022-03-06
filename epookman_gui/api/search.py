@@ -7,7 +7,7 @@
 
 from os import (path, getenv)
 
-from epookman_gui.api.db import (DB_PATH, commit_ebooks, connect, fetch_ebooks)
+from epookman_gui.api.db import (commit_ebooks, connect, fetch_ebooks)
 from epookman_gui.api.ebook import Ebook
 from epookman_gui.api.mime import Mime
 from epookman_gui.api.dirent import Dirent
@@ -16,7 +16,7 @@ from epookman_gui.api.dirent import Dirent
 def scane(dirs):
     ebooks = []
     mime = Mime()
-    conn = connect(DB_PATH)
+    conn = connect()
     db_ebooks = fetch_ebooks(conn)
     conn.close()
 
@@ -40,7 +40,7 @@ def scane(dirs):
 
 def scaneOneByOne(dirPath):
     mime = Mime()
-    conn = connect(DB_PATH)
+    conn = connect()
     db_ebooks = fetch_ebooks(conn)
     conn.close()
 

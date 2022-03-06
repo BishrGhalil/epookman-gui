@@ -7,7 +7,7 @@ from PyQt5.QtCore import QRect, QSize, Qt
 from PyQt5.QtWidgets import (QFrame, QHBoxLayout, QLabel, QLineEdit,
                              QScrollArea, QVBoxLayout, QWidget)
 
-from epookman_gui.api.db import DB_PATH, connect, fetch_ebooks
+from epookman_gui.api.db import (connect, fetch_ebooks)
 from epookman_gui.ui.widgets.listWidget import ListWidget
 from epookman_gui.api.ebook import Ebook
 
@@ -47,7 +47,7 @@ class EbookPageContent(QFrame):
         elif name == "FAV":
             filterClause = f"FAV={1}"
 
-        conn = connect(DB_PATH)
+        conn = connect()
         ebookList = fetch_ebooks(conn, where=filterClause)
         conn.close()
         return ebookList

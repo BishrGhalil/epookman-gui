@@ -6,11 +6,11 @@
 # TODO: Maybe change to QListView
 import subprocess
 
-from PyQt5.QtCore import QEvent, QSize, Qt
+from PyQt5.QtCore import (QEvent, QSize, Qt)
 from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import (QAction, QFrame, QListView, QListWidget,
                              QListWidgetItem, QMenu, QMessageBox)
-from epookman_gui.api.db import DB_PATH, connect, fetch_option
+from epookman_gui.api.db import (connect, fetch_option)
 from epookman_gui.ui.widgets.ebook import (THUMBNAIL_HEIGHT, THUMBNAIL_WIDTH,
                                            EbookItem)
 
@@ -134,7 +134,7 @@ class ListWidget(QListWidget):
                 item.hide()
 
     def openEbook(self, item):
-        conn = connect(DB_PATH)
+        conn = connect()
         ebookReader = fetch_option(conn, "DEFAULT_READER")
         conn.close()
         errFile = open("/dev/null", "w")

@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (QFrame, QHBoxLayout, QVBoxLayout, QWidget,
 from epookman_gui.ui.widgets.leftMenu import LeftMenu
 from epookman_gui.ui.widgets.pages import Pages
 from epookman_gui.api.themer import themer
-from epookman_gui.api.db import (fetch_option, commit_option, connect, DB_PATH)
+from epookman_gui.api.db import (fetch_option, commit_option, connect)
 
 MAINWINDOW_WIDTH_MIN = 1000
 MAINWINDOW_HEIGHT_MIN = 500
@@ -97,14 +97,14 @@ class Ui_MainWindow(object):
             self.changeTheme)
 
     def changeTheme(self, theme):
-        conn = connect(DB_PATH)
+        conn = connect()
         commit_option(conn, "DEFAULT_THEME", theme)
         conn.close()
         styleSheet = themer(theme)
         self.centralwidget.setStyleSheet(styleSheet)
 
     def getDefaultStyle(self):
-        conn = connect(DB_PATH)
+        conn = connect()
         theme = fetch_option(conn, "DEFAULT_THEME")
         if not theme:
             theme = DEFAULT_THEME

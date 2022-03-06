@@ -6,11 +6,11 @@
 import subprocess
 from os import getenv, path
 
-from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QCursor, QIcon, QPixmap
-from PyQt5.QtWidgets import QFrame, QListWidgetItem, QMenu
+from PyQt5.QtCore import (QSize, Qt)
+from PyQt5.QtGui import (QCursor, QIcon, QPixmap)
+from PyQt5.QtWidgets import (QFrame, QListWidgetItem, QMenu)
 
-from epookman_gui.api.db import DB_PATH, commit_ebook, connect
+from epookman_gui.api.db import (commit_ebook, connect)
 from epookman_gui.api.ebook import (STATUS_HAVE_NOT_READ, STATUS_HAVE_READ,
                                     STATUS_READING, EBOOK_TYPE_PDF)
 from epookman_gui.api.thumbnailer import thumbnailer
@@ -95,7 +95,7 @@ class EbookItem(QListWidgetItem):
         self.ebook.set_metadata(self.ebook.get_meta_data_string())
 
     def commit(self):
-        conn = connect(DB_PATH)
+        conn = connect()
         commit_ebook(conn, self.ebook)
         conn.commit()
         conn.close()
