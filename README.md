@@ -1,5 +1,6 @@
 # epookman-gui
 An ebook manager written in Python.
+> THIS VERSION IS DEPRECATED. A NEW MODERN VERSION WILL COME SOON.
 
 # Requirements
 - [Python3](https://www.python.org/download/releases/3.0/)
